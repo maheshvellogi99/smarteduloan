@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartEduLoan — Education Loans, Simplified</title>
+    <meta name="description" content="Get fair credit scores, competitive rates, and fast approvals for education loans through SmartEduLoan's transparent platform.">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* ── Landing-specific overrides ───────────── */
+        body { background: #030303; overflow-x: hidden; }
+
+        /* ── Spline 3D Background ── */
+        #spline-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+        #spline-bg.loaded {
+            opacity: 1;
+        }
+        #spline-bg spline-viewer {
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* WebGL fallback canvas (hidden by default when Spline loads) */
+        #gradient-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            transition: opacity 1.5s ease;
+        }
+        #gradient-canvas.hidden { opacity: 0; }
+
+        /* Dark overlay on top of canvas for text readability */
+        .gradient-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse at center 30%, rgba(3,3,3,0.15) 0%, rgba(3,3,3,0.55) 50%, rgba(3,3,3,0.82) 100%);
+        }
+
+        /* ── CSS Gradient Fallback (shows while Spline loads) ── */
+        .stream-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+            transition: opacity 1.2s ease;
+        }
+        .stream-bg.hidden { opacity: 0; }
+
+        .stream-bg::before,
+        .stream-bg::after {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            width: 200%;
+            height: 200%;
+            animation: streamFlow 18s ease-in-out infinite;
+        }
+
+        .stream-bg::before {
+            background:
+                radial-gradient(ellipse 500px 250px at 20% 50%, rgba(124,92,252,0.12), transparent 60%),
+                radial-gradient(ellipse 600px 200px at 60% 30%, rgba(99,102,241,0.08), transparent 55%),
+                radial-gradient(ellipse 400px 300px at 80% 70%, rgba(139,92,246,0.06), transparent 50%);
+            animation-delay: 0s;
+        }
+
+        .stream-bg::after {
+            background:
+                radial-gradient(ellipse 450px 200px at 40% 60%, rgba(52,211,153,0.07), transparent 55%),
+                radial-gradient(ellipse 550px 250px at 75% 40%, rgba(124,92,252,0.09), transparent 60%),
+                radial-gradient(ellipse 350px 180px at 15% 80%, rgba(99,102,241,0.05), transparent 50%);
+            animation-delay: -9s;
+        }
+
+        /* Flowing stripe layer */
+        .stream-stripe {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.4;
+            transition: opacity 1.2s ease;
+            background: linear-gradient(
+                135deg,
+                transparent 0%,
+                transparent 35%,
+                rgba(124,92,252,0.03) 38%,
+                rgba(124,92,252,0.06) 42%,
+                rgba(99,102,241,0.04) 46%,
+                transparent 50%,
+                transparent 60%,
+                rgba(52,211,153,0.02) 63%,
+                rgba(139,92,246,0.04) 67%,
+                transparent 70%,
+                transparent 100%
+            );
+            background-size: 200% 200%;
+            animation: stripeFlow 12s ease-in-out infinite alternate;
+        }
+        .stream-stripe.hidden { opacity: 0; }
+
+        /* Noise texture overlay (fallback) */
+        .stream-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            transition: opacity 1.2s ease;
+            background:
+                radial-gradient(ellipse at bottom, rgba(3,3,3,0.0) 0%, rgba(3,3,3,0.92) 100%),
+                radial-gradient(ellipse at top, rgba(3,3,3,0.3) 0%, transparent 60%);
+        }
+        .stream-overlay.hidden { opacity: 0; }
+
+        @keyframes streamFlow {
+            0%   { transform: translate(0%, 0%) rotate(0deg); }
+            33%  { transform: translate(5%, -3%) rotate(1deg); }
+            66%  { transform: translate(-3%, 5%) rotate(-1deg); }
+            100% { transform: translate(0%, 0%) rotate(0deg); }
+        }
+        @keyframes stripeFlow {
+            0%   { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* Hide canvas-fallback on mobile for performance */
+        @media (max-width: 768px) {
+            #gradient-canvas {
+                display: none;
+            }
+            .gradient-overlay { display: none; }
+        }
+
+        /* All content above background */
+        .landing-nav, .hero, .stats-strip, .bento-section, .login-section, .landing-footer {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ── Fixed Nav ────────────────────────────── */
+        .landing-nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 0 2rem; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(3,3,3,0.5);
+            backdrop-filter: blur(24px) saturate(1.6);
+            -webkit-backdrop-filter: blur(24px) saturate(1.6);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .landing-nav .nav-brand {
+            display: flex; align-items: center; gap: 0.6rem; text-decoration: none;
+        }
+        .landing-nav .nav-brand .icon {
+            width: 34px; height: 34px; border-radius: 10px;
+            background: linear-gradient(135deg, #6D28D9, #A78BFA);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.95rem; box-shadow: 0 2px 16px rgba(124,92,252,0.35);
+        }
+        .landing-nav .nav-brand span {
+            font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; color: #fff;
+        }
+        .landing-nav .nav-brand span em {
+            font-style: normal; color: var(--primary-light);
+        }
+        .nav-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .nav-actions a { font-size: 0.8125rem; font-weight: 500; color: rgba(255,255,255,0.7); padding: 0.4rem 0.75rem; border-radius: var(--radius-sm); transition: all 0.2s; }
+        .nav-actions a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+        .nav-actions .btn-primary { color: #fff; }
+
+        /* ── Hero ─────────────────────────────────── */
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            padding: 7rem 1.5rem 4rem;
+        }
+
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.4rem 1.125rem; border-radius: var(--radius-full);
+            background: rgba(124,92,252,0.08); border: 1px solid rgba(124,92,252,0.15);
+            font-size: 0.75rem; font-weight: 600; color: var(--primary-light);
+            margin-bottom: 2rem;
+            animation: slideDown 0.6s var(--ease);
+            backdrop-filter: blur(12px);
+        }
+        .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+
+        .hero h1 {
+            font-size: clamp(2.75rem, 6.5vw, 5rem); font-weight: 800; color: #fff;
+            line-height: 1.05; margin-bottom: 1.5rem; max-width: 780px;
+            animation: slideUp 0.7s var(--ease) 0.1s both;
+            text-shadow: 0 2px 40px rgba(0,0,0,0.4);
+        }
+        .hero h1 em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 1.125rem; color: rgba(255,255,255,0.7); max-width: 550px;
+            line-height: 1.75; margin-bottom: 2.75rem;
+            animation: slideUp 0.7s var(--ease) 0.2s both;
+        }
+
+        .hero-cta {
+            display: flex; gap: 0.875rem; flex-wrap: wrap; justify-content: center;
+            animation: slideUp 0.7s var(--ease) 0.3s both;
+        }
+        .hero-cta .btn-primary {
+            padding: 0.85rem 2rem; font-size: 0.9375rem; border-radius: var(--radius-lg);
+            background: var(--primary); box-shadow: 0 4px 20px rgba(124,92,252,0.35);
+        }
+        .hero-cta .btn-primary:hover { box-shadow: 0 8px 32px rgba(124,92,252,0.5); transform: translateY(-2px); }
+        .hero-cta .btn-outline {
+            padding: 0.85rem 2rem; font-size: 0.9375rem; border-radius: var(--radius-lg);
+            border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.8);
+            backdrop-filter: blur(8px);
+        }
+        .hero-cta .btn-outline:hover { border-color: rgba(255,255,255,0.3); color: #fff; background: rgba(255,255,255,0.04); }
+
+        /* ── Stats strip ──────────────────────────── */
+        .stats-strip {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            max-width: 900px; margin: 0 auto 5rem; gap: 1px;
+            background: rgba(255,255,255,0.06); border-radius: var(--radius-xl);
+            overflow: hidden; animation: scaleIn 0.6s var(--ease) 0.4s both;
+            backdrop-filter: blur(16px);
+        }
+        .ss-item {
+            background: rgba(13,13,13,0.75); text-align: center; padding: 2rem 1.25rem;
+            transition: background 0.3s;
+            backdrop-filter: blur(8px);
+        }
+        .ss-item:hover { background: rgba(22,22,22,0.85); }
+        .ss-num {
+            font-family: 'Outfit', sans-serif; font-size: 1.875rem; font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .ss-label { font-size: 0.6875rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-top: 0.375rem; }
+
+        /* ── Section titles ────────────────────────── */
+        .section-title { text-align: center; margin-bottom: 3rem; }
+        .section-title h2 { font-size: 2.125rem; font-weight: 700; margin-bottom: 0.625rem; text-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+        .section-title p { color: rgba(255,255,255,0.55); font-size: 0.9375rem; max-width: 500px; margin: 0 auto; }
+
+        /* ── Bento Grid ───────────────────────────── */
+        .bento-section { max-width: 960px; margin: 0 auto 6rem; padding: 0 1.5rem; }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: 1rem;
+        }
+        .bento-card {
+            background: rgba(17,17,17,0.6);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius-xl);
+            padding: 1.75rem;
+            transition: all 0.35s var(--ease);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+        .bento-card:hover {
+            border-color: rgba(124,92,252,0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.4), 0 0 60px rgba(124,92,252,0.06);
+        }
+        .bento-card.wide { grid-column: span 2; }
+        .bento-card .bento-icon {
+            width: 44px; height: 44px;
+            border-radius: var(--radius);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; margin-bottom: 1.25rem;
+        }
+        .bento-card .bento-icon.purple { background: rgba(124,92,252,0.12); }
+        .bento-card .bento-icon.green  { background: rgba(52,211,153,0.12); }
+        .bento-card .bento-icon.yellow { background: rgba(251,191,36,0.12); }
+        .bento-card h3 { font-size: 1.0625rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff; }
+        .bento-card p  { font-size: 0.8125rem; color: rgba(255,255,255,0.6); line-height: 1.75; }
+
+        /* ── Login Section ─────────────────────────── */
+        .login-section { max-width: 960px; margin: 0 auto 4rem; padding: 0 1.5rem; }
+        .login-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .login-card {
+            background: rgba(17,17,17,0.65);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            transition: all 0.35s var(--ease);
+            backdrop-filter: blur(24px);
+        }
+        .login-card:hover {
+            border-color: rgba(124,92,252,0.15);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        .login-card-head {
+            display: flex; align-items: center; gap: 0.75rem;
+            margin-bottom: 1.75rem;
+        }
+        .login-card-icon {
+            width: 42px; height: 42px; border-radius: var(--radius);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.125rem;
+        }
+        .login-card-title { font-weight: 700; font-size: 1rem; color: #fff; }
+        .login-card-sub { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
+        .login-card .btn-primary { width: 100%; margin-top: 0.5rem; padding: 0.75rem; }
+        .login-card .login-footer { text-align: center; margin-top: 1rem; font-size: 0.8125rem; color: rgba(255,255,255,0.45); }
+        .login-card .login-footer a { color: var(--primary-light); font-weight: 600; }
+        .login-card .error-message {
+            background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.15);
+            color: var(--danger); padding: 0.625rem 0.75rem; border-radius: var(--radius-sm);
+            font-size: 0.8125rem; margin-bottom: 1rem; display: none;
+        }
+
+        /* ── Footer ───────────────────────────────── */
+        .landing-footer {
+            text-align: center; padding: 3rem 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.3); font-size: 0.75rem;
+        }
+        .landing-footer strong { color: rgba(255,255,255,0.5); }
+
+        /* ── Responsive ───────────────────────────── */
+        @media (max-width: 768px) {
+            .landing-nav { padding: 0 1rem; }
+            .hero { padding: 6rem 1rem 3rem; }
+            .stats-strip { grid-template-columns: repeat(2, 1fr); }
+            .bento-grid { grid-template-columns: 1fr; }
+            .bento-card.wide { grid-column: span 1; }
+            .login-grid { grid-template-columns: 1fr; }
+            .nav-actions a.hide-mobile { display: none; }
+        }
+        @media (max-width: 480px) {
+            .stats-strip { grid-template-columns: 1fr; border-radius: var(--radius-lg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Spline 3D Background (user's Clarity Stream design) -->
+    <div id="spline-bg"></div>
+    <div class="gradient-overlay"></div>
+
+    <!-- WebGL Animated Gradient Fallback -->
+    <canvas id="gradient-canvas"></canvas>
+
+    <!-- CSS Gradient Fallback (visible on mobile / if everything fails) -->
+    <div class="stream-bg" id="fallback-bg"></div>
+    <div class="stream-stripe" id="fallback-stripe"></div>
+    <div class="stream-overlay" id="fallback-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="landing-nav">
+        <a href="#" class="nav-brand">
+            <div class="icon">🎓</div>
+            <span><em>Smart</em>EduLoan</span>
+        </a>
+        <div class="nav-actions">
+            <a href="#how-it-works" class="hide-mobile">How it Works</a>
+            <a href="#login-section">Login</a>
+            <a href="/register.html" class="btn btn-primary btn-sm">Register</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            Trusted by students since 2024
+        </div>
+        <h1>Education Loans,<br><em>Simplified.</em></h1>
+        <p class="hero-sub">
+            SmartEduLoan bridges students and partner banks — giving you a fair credit score, competitive rates, and fast approvals.
+        </p>
+        <div class="hero-cta">
+            <a href="#login-section" class="btn btn-primary btn-lg">Get Started</a>
+            <a href="#how-it-works" class="btn btn-outline btn-lg">Learn More →</a>
+        </div>
+    </section>
+
+    <!-- Stats Strip -->
+    <div class="stats-strip stagger-in">
+        <div class="ss-item"><div class="ss-num">₹5L+</div><div class="ss-label">Avg. Loan Amount</div></div>
+        <div class="ss-item"><div class="ss-num">3+</div><div class="ss-label">Partner Banks</div></div>
+        <div class="ss-item"><div class="ss-num">48h</div><div class="ss-label">Avg. Approval</div></div>
+        <div class="ss-item"><div class="ss-num">0%</div><div class="ss-label">Hidden Charges</div></div>
+    </div>
+
+    <!-- How it Works — Bento Grid -->
+    <section class="bento-section" id="how-it-works">
+        <div class="section-title">
+            <h2>How SmartEduLoan Works</h2>
+            <p>Three simple steps to get your education funded.</p>
+        </div>
+        <div class="bento-grid stagger-in">
+            <div class="bento-card wide">
+                <div class="bento-icon purple">📝</div>
+                <h3>1. Build Your Credit Profile</h3>
+                <p>Enter your academic scores, upload documents (Aadhar, PAN, marksheets), and our algorithm calculates your credit score — giving you transparent, fair eligibility.</p>
+            </div>
+            <div class="bento-card">
+                <div class="bento-icon green">🏦</div>
+                <h3>2. Choose a Bank</h3>
+                <p>Browse partner bank products, compare interest rates, and submit your loan application in minutes.</p>
+            </div>
+            <div class="bento-card">
+                <div class="bento-icon yellow">⚡</div>
+                <h3>3. Get Approved Fast</h3>
+                <p>Admin reviews your application, bank verifies your documents, and funds are disbursed — usually within 48 hours.</p>
+            </div>
+            <div class="bento-card wide">
+                <div class="bento-icon green">🏛️</div>
+                <h3>For Partner Banks</h3>
+                <p>Register your institution, create loan products with custom rates and limits, receive pre-verified applications with credit scores, and manage the entire flow from a clean dashboard.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Section -->
+    <section class="login-section" id="login-section">
+        <div class="section-title">
+            <h2>Access Your Portal</h2>
+            <p>Sign in to your dashboard below.</p>
+        </div>
+        <div class="login-grid">
+            <!-- Student Login -->
+            <div class="login-card" id="student-login-card">
+                <div class="login-card-head">
+                    <div class="login-card-icon" style="background: rgba(124,92,252,0.1);">🎒</div>
+                    <div>
+                        <div class="login-card-title">Student Login</div>
+                        <div class="login-card-sub">Access your loans & credit profile</div>
+                    </div>
+                </div>
+                <div class="error-message" id="student-error"></div>
+                <form id="student-login-form">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="student-email" placeholder="you@university.edu" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="student-password" placeholder="••••••••" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Sign In →</button>
+                </form>
+                <div class="login-footer">
+                    New student? <a href="/register.html">Create Account</a>
+                </div>
+            </div>
+
+            <!-- Bank / Admin Login -->
+            <div class="login-card" id="bank-login-card">
+                <div class="login-card-head">
+                    <div class="login-card-icon" style="background: rgba(52,211,153,0.1);">🏦</div>
+                    <div>
+                        <div class="login-card-title">Partner Bank Login</div>
+                        <div class="login-card-sub">Review assigned applications</div>
+                    </div>
+                </div>
+                <div class="error-message" id="bank-error"></div>
+                <form id="bank-login-form">
+                    <div class="form-group">
+                        <label>Bank Email Address</label>
+                        <input type="email" id="bank-email" placeholder="admin@yourbank.com" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="bank-password" placeholder="••••••••" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" style="background: var(--accent); box-shadow: 0 4px 16px rgba(52,211,153,0.3);">Sign In →</button>
+                </form>
+                <div class="login-footer">
+                    New bank? <a href="/register.html">Register Your Bank</a>
+                    <br><br>
+                    <a href="#admin-login-section" onclick="showAdminLogin()" style="font-size: 0.75rem; color: rgba(255,255,255,0.3);">🔒 Administrator Login</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Login (hidden by default) -->
+        <div id="admin-login-section" style="display:none; max-width: 420px; margin: 1.5rem auto 0;">
+            <div class="login-card">
+                <div class="login-card-head">
+                    <div class="login-card-icon" style="background: rgba(251,191,36,0.1);">🛡️</div>
+                    <div>
+                        <div class="login-card-title">Admin Login</div>
+                        <div class="login-card-sub">System administration access</div>
+                    </div>
+                </div>
+                <div class="error-message" id="admin-error"></div>
+                <form id="admin-login-form">
+                    <div class="form-group">
+                        <label>Admin Email</label>
+                        <input type="email" id="admin-email" placeholder="admin@smarteduloan.com" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="admin-password" placeholder="••••••••" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" style="background: var(--warning); color: #000; box-shadow: 0 4px 16px rgba(251,191,36,0.3);">Sign In as Admin →</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <strong>SmartEduLoan</strong> · A mediator platform connecting students with partner banks for transparent education loans.<br>
+        © 2024 SmartEduLoan · Academic Project · All rights reserved
+    </footer>
+
+
+
+    <script src="/js/api.js"></script>
+    <script>
+        // Redirect if already logged in
+        const existingUser = localStorage.getItem('user');
+        const existingToken = localStorage.getItem('token');
+        if (existingUser && existingToken) {
+            try {
+                const u = JSON.parse(existingUser);
+                if (u.role) window.location.href = `/${u.role}/dashboard.html`;
+            } catch(e) {}
+        }
+
+        function showAdminLogin() {
+            document.getElementById('admin-login-section').style.display = 'block';
+            document.getElementById('admin-email').focus();
+        }
+
+        async function handleLogin(formId, emailId, passwordId, errorId, role) {
+            const form = document.getElementById(formId);
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const errorEl = document.getElementById(errorId);
+                errorEl.style.display = 'none';
+                const btn = form.querySelector('button[type="submit"]');
+                const origText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Signing in...';
+
+                const email = document.getElementById(emailId).value;
+                const password = document.getElementById(passwordId).value;
+
+                try {
+                    const res = await api.post('/auth/login', { email, password });
+                    const data = res.data;
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = `/${data.user.role}/dashboard.html`;
+                } catch (err) {
+                    errorEl.textContent = err.response?.data?.message || err.message || 'Login failed. Make sure the backend server is running.';
+                    errorEl.style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = origText;
+                }
+            });
+        }
+
+        handleLogin('student-login-form', 'student-email', 'student-password', 'student-error', 'student');
+        handleLogin('bank-login-form', 'bank-email', 'bank-password', 'bank-error', 'bank');
+        handleLogin('admin-login-form', 'admin-email', 'admin-password', 'admin-error', 'admin');
+    </script>
+
+    <!-- Spline Viewer Runtime -->
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.71/build/spline-viewer.js"></script>
+
+    <!-- Background loading logic: Spline → WebGL fallback → CSS fallback -->
+    <script type="module">
+    (function() {
+        var isMobile = window.innerWidth <= 768;
+        var splineContainer = document.getElementById('spline-bg');
+        var gradientCanvas = document.getElementById('gradient-canvas');
+
+        // On mobile, skip Spline and WebGL, just use CSS fallback
+        if (isMobile) {
+            if (splineContainer) splineContainer.style.display = 'none';
+            if (gradientCanvas) gradientCanvas.style.display = 'none';
+            return;
+        }
+
+        // --- Try Spline first ---
+        var splineLoaded = false;
+
+        if (splineContainer) {
+            var viewer = document.createElement('spline-viewer');
+            viewer.setAttribute('url', 'https://prod.spline.design/Lbw0CVJjzh9vDXlq/scene.splinecode');
+            viewer.setAttribute('loading-anim-type', 'none');
+            splineContainer.appendChild(viewer);
+
+            // Detect when Spline loads via MutationObserver (watching for canvas)
+            var observer = new MutationObserver(function() {
+                var canvas = splineContainer.querySelector('canvas');
+                if (canvas && !splineLoaded) {
+                    splineLoaded = true;
+                    setTimeout(function() {
+                        splineContainer.classList.add('loaded');
+                        // Hide WebGL and CSS fallbacks
+                        if (gradientCanvas) gradientCanvas.classList.add('hidden');
+                        ['fallback-bg', 'fallback-stripe', 'fallback-overlay'].forEach(function(id) {
+                            var el = document.getElementById(id);
+                            if (el) el.style.display = 'none';
+                        });
+                    }, 1000);
+                    observer.disconnect();
+                }
+            });
+            observer.observe(splineContainer, { childList: true, subtree: true });
+
+            // Also listen for the load event
+            viewer.addEventListener('load', function() {
+                if (!splineLoaded) {
+                    splineLoaded = true;
+                    setTimeout(function() {
+                        splineContainer.classList.add('loaded');
+                        if (gradientCanvas) gradientCanvas.classList.add('hidden');
+                        ['fallback-bg', 'fallback-stripe', 'fallback-overlay'].forEach(function(id) {
+                            var el = document.getElementById(id);
+                            if (el) el.style.display = 'none';
+                        });
+                    }, 800);
+                    observer.disconnect();
+                }
+            });
+        }
+
+        // --- WebGL fallback (immediate, visible until Spline loads) ---
+        if (gradientCanvas) {
+            var gl = gradientCanvas.getContext('webgl') || gradientCanvas.getContext('experimental-webgl');
+            if (gl) {
+                // Hide CSS fallback since WebGL is available
+                ['fallback-bg', 'fallback-stripe', 'fallback-overlay'].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+
+                var vertSrc = 'attribute vec2 position; void main() { gl_Position = vec4(position, 0.0, 1.0); }';
+                var fragSrc = `
+                    precision highp float;
+                    uniform float u_time;
+                    uniform vec2 u_resolution;
+                    vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+                    vec2 mod289(vec2 x){return x-floor(x*(1.0/289.0))*289.0;}
+                    vec3 permute(vec3 x){return mod289(((x*34.0)+1.0)*x);}
+                    float snoise(vec2 v){
+                        const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);
+                        vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);
+                        vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0);
+                        vec4 x12=x0.xyxy+C.xxzz;x12.xy-=i1;i=mod289(i);
+                        vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0));
+                        vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0);
+                        m=m*m;m=m*m;
+                        vec3 x_=2.0*fract(p*C.www)-1.0;vec3 h=abs(x_)-0.5;
+                        vec3 ox=floor(x_+0.5);vec3 a0=x_-ox;
+                        m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);
+                        vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;
+                        return 130.0*dot(m,g);
+                    }
+                    void main(){
+                        vec2 uv=gl_FragCoord.xy/u_resolution;float t=u_time*0.15;
+                        float n1=snoise(uv*2.0+vec2(t*0.7,t*0.5))*0.5+0.5;
+                        float n2=snoise(uv*3.0+vec2(-t*0.4,t*0.8))*0.5+0.5;
+                        float n3=snoise(uv*1.5+vec2(t*0.3,-t*0.6))*0.5+0.5;
+                        float n4=snoise(uv*4.0+vec2(t*0.9,t*0.2))*0.5+0.5;
+                        vec3 c1=vec3(0.486,0.361,0.988);vec3 c2=vec3(0.388,0.400,0.945);
+                        vec3 c3=vec3(0.204,0.827,0.600);vec3 c4=vec3(0.545,0.361,0.965);
+                        vec3 c5=vec3(0.012,0.012,0.012);
+                        vec3 color=c5;
+                        color=mix(color,c1,n1*0.35*smoothstep(0.3,0.8,n1));
+                        color=mix(color,c2,n2*0.25*smoothstep(0.4,0.9,n2));
+                        color=mix(color,c3,n3*0.18*smoothstep(0.5,0.95,n3));
+                        color=mix(color,c4,n4*0.15*smoothstep(0.55,0.9,n4));
+                        float vignette=1.0-smoothstep(0.2,1.4,length(uv-0.5)*1.6);
+                        color*=(0.6+0.4*vignette);
+                        float grain=(snoise(gl_FragCoord.xy*0.5+t*100.0)*0.03);
+                        color+=grain;
+                        gl_FragColor=vec4(color,1.0);
+                    }
+                `;
+
+                function createShader(type, src) {
+                    var s = gl.createShader(type);
+                    gl.shaderSource(s, src); gl.compileShader(s);
+                    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) return null;
+                    return s;
+                }
+                var vs = createShader(gl.VERTEX_SHADER, vertSrc);
+                var fs = createShader(gl.FRAGMENT_SHADER, fragSrc);
+                if (vs && fs) {
+                    var prog = gl.createProgram();
+                    gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+                    if (gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+                        gl.useProgram(prog);
+                        var buf = gl.createBuffer();
+                        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+                        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+                        var pos = gl.getAttribLocation(prog, 'position');
+                        gl.enableVertexAttribArray(pos);
+                        gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+                        var uTime = gl.getUniformLocation(prog, 'u_time');
+                        var uRes = gl.getUniformLocation(prog, 'u_resolution');
+                        function resize() {
+                            var dpr = Math.min(window.devicePixelRatio || 1, 2);
+                            gradientCanvas.width = window.innerWidth * dpr;
+                            gradientCanvas.height = window.innerHeight * dpr;
+                            gl.viewport(0, 0, gradientCanvas.width, gradientCanvas.height);
+                        }
+                        resize(); window.addEventListener('resize', resize);
+                        var start = performance.now();
+                        function render() {
+                            if (splineLoaded) return; // Stop WebGL when Spline takes over
+                            gl.uniform1f(uTime, (performance.now() - start) / 1000.0);
+                            gl.uniform2f(uRes, gradientCanvas.width, gradientCanvas.height);
+                            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                            requestAnimationFrame(render);
+                        }
+                        render();
+                    }
+                }
+            }
+        }
+    })();
+    </script>
+</body>
+</html>

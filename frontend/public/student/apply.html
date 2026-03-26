@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartEduLoan — Apply for Loan</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        .prereq-blocker { background:var(--danger-dim); border:1px solid rgba(248,113,113,0.12); border-radius:var(--radius-lg); padding:1.75rem; margin-bottom:1.75rem; }
+        .prereq-title { font-size:1.125rem; font-weight:700; color:var(--danger); margin-bottom:0.5rem; }
+        .prereq-subtitle { font-size:0.875rem; color:var(--text-muted); margin-bottom:1.5rem; line-height:1.6; }
+        .prereq-list { display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1.25rem; }
+        .prereq-row { display:flex; align-items:center; gap:0.75rem; font-size:0.8125rem; padding:0.5rem 0.75rem; border-radius:var(--radius-sm); }
+        .prereq-ok { background:var(--accent-dim); color:var(--accent); }
+        .prereq-missing { background:var(--danger-dim); color:var(--danger); }
+        .prereq-icon { font-size:1rem; }
+        .prereq-badge { margin-left:auto; font-size:0.625rem; font-weight:700; background:rgba(248,113,113,0.12); color:var(--danger); border-radius:var(--radius-full); padding:0.15rem 0.5rem; text-transform:uppercase; letter-spacing:0.05em; }
+
+        #eligibility-info { background:var(--primary-dim); border:1px solid rgba(124,92,252,0.12); border-radius:var(--radius); padding:1.25rem; margin-bottom:1.75rem; }
+        #eligibility-info p { color:var(--primary-light); }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar"></aside>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <div class="content-wrapper">
+            <div class="mobile-topbar" id="mobile-topbar"></div>
+            <main class="main-content" style="max-width:780px;">
+                <div class="page-header"><h1>Apply for Loan</h1></div>
+                <p class="text-muted text-sm" style="margin-top:-1.5rem; margin-bottom:1.75rem;">Choose a loan product from our partner banks.</p>
+
+                <div id="apply-message" class="alert" style="display:none;"></div>
+                <div id="loading" class="loading-msg">Loading profile & products...</div>
+                <div id="no-profile-warning" style="display:none;" class="alert alert-danger">You need to <a href="/student/profile.html">build your credit profile</a> first.</div>
+
+                <form id="apply-form" style="display:none;">
+                    <div id="eligibility-info">
+                        <p class="text-sm">Max Eligible: <span id="max-amount" style="font-weight:700;font-size:1rem;"></span></p>
+                        <p class="text-sm mt-2">Rate: <span id="rec-rate" style="font-weight:700;"></span> · Score: <span id="credit-score-display" style="font-weight:700;"></span></p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group"><label>Loan Type</label><select id="loanType"><option value="education">Education</option><option value="personal">Personal</option></select></div>
+                        <div class="form-group"><label>Amount (₹)</label><input type="number" id="requestedAmount" min="10000" required /></div>
+                        <div class="form-group"><label>Tenure (Months)</label><input type="number" id="tenureMonths" min="6" max="84" value="24" required /></div>
+                        <div class="form-group"><label>Bank Product</label><select id="bankProductId" required><option value="">Loading...</option></select></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-6" id="apply-btn">Submit Application</button>
+                </form>
+            </main>
+        </div>
+    </div>
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/student.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = utils.checkAuth(['student']);
+            if (!user) return;
+            utils.setupSidebar(user);
+            await loadApplyPage();
+        });
+    </script>
+</body>
+</html>

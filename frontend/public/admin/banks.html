@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartEduLoan — Manage Banks</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar"></aside>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <div class="content-wrapper">
+            <div class="mobile-topbar" id="mobile-topbar"></div>
+            <main class="main-content">
+                <div class="page-header"><h1>Partner Banks</h1></div>
+                <p class="text-muted text-sm" style="margin-top:-1.5rem; margin-bottom:1.75rem;">Banks register via the registration page. Review and manage their status below.</p>
+                <div class="glass-card">
+                    <div id="banks-loading" class="loading-msg">Loading banks...</div>
+                    <div id="banks-list"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = utils.checkAuth(['admin']);
+            if (!user) return;
+            utils.setupSidebar(user);
+            await loadAdminBanks();
+        });
+    </script>
+</body>
+</html>

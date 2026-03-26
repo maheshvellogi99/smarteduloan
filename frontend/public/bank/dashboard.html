@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartEduLoan — Bank Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .tab-bar { display:flex; gap:3px; padding:3px; background:var(--surface-2); border-radius:var(--radius); margin-bottom:2rem; position:relative; z-index:1; }
+        .tab-bar-indicator { position:absolute; top:3px; bottom:3px; left:3px; background:var(--surface-0); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm); z-index:-1; transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .tab-bar button { flex:1; padding:0.6rem 1rem; background:transparent; border:none; border-radius:var(--radius-sm); font-size:0.8125rem; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; color:var(--text-muted); transition:color 0.25s var(--ease); }
+        .tab-bar button.active { color:#fff; }
+        .tab-bar button:hover:not(.active) { color:var(--text-secondary); }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar"></aside>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <div class="content-wrapper">
+            <div class="mobile-topbar" id="mobile-topbar"></div>
+            <main class="main-content">
+                <div class="page-header">
+                    <h1>Bank Portal</h1>
+                </div>
+
+                <div id="loading" class="loading-msg">Loading dashboard...</div>
+
+                <div id="bank-dashboard-content" style="display:none;">
+                    <!-- Overview Stat Cards (Populated via JS) -->
+                    <div class="bank-stat-grid stagger-in">
+                        <div class="stat-card stat-card-primary text-center">
+                            <div class="stat-icon-circle ico-primary" style="margin:0 auto 0.75rem;">📦</div>
+                            <div class="stat-label">Total Products</div>
+                            <div class="stat-value stat-value-animated" id="stat-products">—</div>
+                        </div>
+                        <div class="stat-card stat-card-success text-center">
+                            <div class="stat-icon-circle ico-success" style="margin:0 auto 0.75rem;">💳</div>
+                            <div class="stat-label" style="color:var(--success);">Assigned Loans</div>
+                            <div class="stat-value stat-value-animated" id="stat-loans">—</div>
+                        </div>
+                        <div class="stat-card stat-card-info text-center" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                            <div class="stat-label" style="margin-bottom:0.5rem;">Average Rate</div>
+                            <div class="stat-value stat-value-animated" id="stat-avg-rate">—</div>
+                        </div>
+                        <div class="stat-card stat-card-warning text-center" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                            <div class="stat-label" style="color:var(--warning); margin-bottom:0.5rem;">Pending Verifications</div>
+                            <div class="stat-value stat-value-animated" id="stat-pending" style="color:var(--warning);">—</div>
+                        </div>
+                    </div>
+
+                    <div class="tab-bar">
+                        <div class="tab-bar-indicator" id="tab-indicator" style="width:50%; transform:translateX(0);"></div>
+                        <button id="btn-tab-products" class="active" onclick="showTab('tab-products',this, 0)">🏷️ Loan Products</button>
+                        <button id="btn-tab-loans" onclick="showTab('tab-loans',this, 1)">📋 Verification</button>
+                    </div>
+
+                    <!-- Products tab -->
+                    <div id="tab-products" class="stagger-in">
+                        <div class="dashboard-row cols-3-1" style="align-items:start;">
+                            <div class="glass-card">
+                                <div class="section-head" style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>My Products</span>
+                                    <span class="badge badge-primary" id="product-count-badge">0</span>
+                                </div>
+                                <div id="products-list"><p class="text-muted text-center" style="padding:2rem 0;">Loading...</p></div>
+                            </div>
+
+                            <div style="display:flex; flex-direction:column; gap:1.5rem;">
+                                <div class="chart-card" id="product-chart-card" style="display:none;">
+                                    <div class="chart-title">Product Distribution</div>
+                                    <div class="chart-wrapper">
+                                        <canvas id="chart-product-types"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="glass-card">
+                                    <div class="section-head">Add Product</div>
+                                    <div id="product-form-msg" class="alert" style="display:none;"></div>
+                                    <form id="product-form">
+                                        <div class="form-group"><label>Product Name</label><input type="text" id="p-name" placeholder="e.g. Education Loan Flexi" required></div>
+                                        <div class="form-group"><label>Type</label><select id="p-type"><option value="education">Education</option><option value="personal">Personal</option><option value="skill">Skill Dev</option></select></div>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="form-group"><label>Min Amount (₹)</label><input type="number" id="p-min-amt" value="10000" required></div>
+                                            <div class="form-group"><label>Max Amount (₹)</label><input type="number" id="p-max-amt" value="1000000" required></div>
+                                            <div class="form-group"><label>Interest (%)</label><input type="number" id="p-rate" step="0.1" value="8.5" required></div>
+                                            <div class="form-group"><label>Min Tenure (m)</label><input type="number" id="p-min-ten" value="12" required></div>
+                                            <div class="form-group"><label>Max Tenure (m)</label><input type="number" id="p-max-ten" value="84" required></div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-block mt-4" id="add-product-btn">Add Product</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loans tab -->
+                    <div id="tab-loans" style="display:none;" class="stagger-in">
+                        <div class="dashboard-row cols-2-1" style="grid-template-columns: 2fr 1fr; align-items:start;" id="bank-content">
+                            <div class="glass-card">
+                                <div class="section-head">Assigned Applications</div>
+                                <div id="bank-loans-table"></div>
+                            </div>
+                            <div class="glass-card" id="bank-review-panel" style="position:sticky; top:1rem; max-height:90vh; overflow-y:auto;">
+                                <div id="bank-review-empty" class="empty-state"><div class="empty-icon">🏦</div><p>Select a loan to verify</p></div>
+                                <div id="bank-review-content" style="display:none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/bank.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = utils.checkAuth(['bank']);
+            if (!user) return;
+            utils.setupSidebar(user);
+            await loadBankDashboard();
+        });
+
+        function showTab(id, btnEl, index) {
+            ['tab-products','tab-loans'].forEach(t => { document.getElementById(t).style.display = t===id ? 'block' : 'none'; });
+            document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+
+            // Move indicator
+            const indicator = document.getElementById('tab-indicator');
+            indicator.style.transform = `translateX(${index * 100}%)`;
+        }
+    </script>
+</body>
+</html>

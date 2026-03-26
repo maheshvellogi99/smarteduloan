@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartEduLoan — Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar"></aside>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <div class="content-wrapper">
+            <div class="mobile-topbar" id="mobile-topbar"></div>
+            <main class="main-content">
+                <div id="loading">
+                    <div class="stat-grid"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div>
+                    <div class="dashboard-row"><div class="skeleton skeleton-card" style="height:280px;"></div><div class="skeleton skeleton-card" style="height:280px;"></div></div>
+                </div>
+                <div id="admin-content" style="display:none;">
+                    <div class="page-header">
+                        <h1>Admin Overview</h1>
+                        <div class="flex gap-2">
+                            <a href="/admin/applications.html" class="btn btn-primary btn-sm">Applications</a>
+                            <a href="/admin/banks.html" class="btn btn-outline btn-sm">Banks</a>
+                        </div>
+                    </div>
+
+                    <!-- Stat Cards with gradient top accents -->
+                    <div class="admin-stat-grid stagger-in">
+                        <div class="stat-card stat-card-primary text-center">
+                            <div class="stat-icon-circle ico-primary" style="margin:0 auto 0.75rem;">📊</div>
+                            <div class="stat-label">Total Applications</div>
+                            <div class="stat-value stat-value-animated" id="stat-total">—</div>
+                        </div>
+                        <div class="stat-card stat-card-success text-center">
+                            <div class="stat-icon-circle ico-success" style="margin:0 auto 0.75rem;">✅</div>
+                            <div class="stat-label" style="color:var(--success);">Approved</div>
+                            <div class="stat-value stat-value-animated" id="stat-approved" style="color:var(--success);">—</div>
+                        </div>
+                        <div class="stat-card stat-card-warning text-center">
+                            <div class="stat-icon-circle ico-warning" style="margin:0 auto 0.75rem;">⏳</div>
+                            <div class="stat-label" style="color:var(--warning);">Pending</div>
+                            <div class="stat-value stat-value-animated" id="stat-pending" style="color:var(--warning);">—</div>
+                        </div>
+                        <div class="stat-card stat-card-danger text-center">
+                            <div class="stat-icon-circle ico-danger" style="margin:0 auto 0.75rem;">❌</div>
+                            <div class="stat-label" style="color:var(--danger);">Rejected</div>
+                            <div class="stat-value stat-value-animated" id="stat-rejected" style="color:var(--danger);">—</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="dashboard-row">
+                        <div class="chart-card">
+                            <div class="chart-title">Application Status Distribution</div>
+                            <div class="chart-wrapper-lg">
+                                <canvas id="chart-app-status"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">Risk Distribution</div>
+                            <div class="chart-wrapper-lg">
+                                <canvas id="chart-risk"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = utils.checkAuth(['admin']);
+            if (!user) return;
+            utils.setupSidebar(user);
+            await loadAdminDashboard();
+        });
+    </script>
+</body>
+</html>

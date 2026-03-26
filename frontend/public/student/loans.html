@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartEduLoan — My Loans</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .loan-summary-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.75rem; }
+        .ls-item { background:var(--surface-1); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.25rem; text-align:center; transition:all 0.25s var(--ease); position:relative; overflow:hidden; }
+        .ls-item::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity 0.3s; }
+        .ls-item:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+        .ls-item:hover::before { opacity:1; }
+        .ls-num { display:block; font-size:1.75rem; font-weight:700; font-family:'Outfit',sans-serif; }
+        .ls-label { font-size:0.625rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-top:0.25rem; font-weight:600; }
+        .ls-approved .ls-num { color:var(--success); }
+        .ls-approved::before { background:linear-gradient(90deg,transparent,var(--success),transparent); }
+        .ls-pending .ls-num { color:var(--warning); }
+        .ls-pending::before { background:linear-gradient(90deg,transparent,var(--warning),transparent); }
+        .ls-rejected .ls-num { color:var(--danger); }
+        .ls-rejected::before { background:linear-gradient(90deg,transparent,var(--danger),transparent); }
+
+        .loan-card { background:var(--surface-1); border:1px solid var(--border); border-radius:var(--radius-lg); padding:1.5rem; margin-bottom:1rem; transition:all 0.25s var(--ease); }
+        .loan-card:hover { border-color:rgba(124,92,252,0.15); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.25); }
+        .loan-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.875rem; flex-wrap:wrap; gap:0.5rem; }
+        .loan-type-badge { font-size:0.625rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; background:var(--primary-dim); color:var(--primary-light); border-radius:var(--radius-full); padding:0.2rem 0.625rem; margin-right:0.5rem; }
+        .loan-amount { font-size:1.375rem; font-weight:700; }
+        .loan-status-pill { font-size:0.75rem; font-weight:700; border-radius:var(--radius-full); padding:0.25rem 0.875rem; white-space:nowrap; }
+        .loan-card-meta { display:flex; gap:1.5rem; font-size:0.8125rem; color:var(--text-muted); flex-wrap:wrap; margin-bottom:1rem; }
+        .loan-card-meta strong { color:var(--text-secondary); }
+        .loan-rejection-note { background:var(--danger-dim); border:1px solid rgba(248,113,113,0.1); border-radius:var(--radius-sm); padding:0.75rem 1rem; font-size:0.8125rem; color:var(--danger); margin-bottom:0.75rem; }
+        .loan-disbursal-info { background:var(--accent-dim); border:1px solid rgba(52,211,153,0.1); border-radius:var(--radius-sm); padding:0.75rem 1rem; font-size:0.8125rem; color:var(--accent); margin-bottom:0.75rem; }
+
+        @media(max-width:768px) { .loan-summary-strip { grid-template-columns:repeat(2,1fr); } }
+        @media(max-width:480px) { .loan-summary-strip { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar"></aside>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <div class="content-wrapper">
+            <div class="mobile-topbar" id="mobile-topbar"></div>
+            <main class="main-content">
+                <div class="page-header">
+                    <h1>My Loans</h1>
+                    <a href="/student/apply.html" class="btn btn-primary btn-sm">+ Apply New</a>
+                </div>
+                <div id="loading" class="loading-msg">Loading your loans...</div>
+                <div id="loans-content" style="display:none;" class="stagger-in">
+                    <div class="loan-summary-strip">
+                        <div class="ls-item"><span class="ls-num stat-value-animated" id="ls-total">0</span><span class="ls-label">Total</span></div>
+                        <div class="ls-item ls-approved"><span class="ls-num stat-value-animated" id="ls-approved">0</span><span class="ls-label">Approved</span></div>
+                        <div class="ls-item ls-pending"><span class="ls-num stat-value-animated" id="ls-pending">0</span><span class="ls-label">Pending</span></div>
+                        <div class="ls-item ls-rejected"><span class="ls-num stat-value-animated" id="ls-rejected">0</span><span class="ls-label">Rejected</span></div>
+                    </div>
+
+                    <div class="dashboard-row cols-1-3" style="align-items:start;">
+                        <!-- Chart area -->
+                        <div class="chart-card" id="student-loans-chart-card" style="display:none; position:sticky; top:1rem;">
+                            <div class="chart-title">Status Breakdown</div>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-my-loans"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Loan Cards area -->
+                        <div id="loan-cards"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/student.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = utils.checkAuth(['student']);
+            if (!user) return;
+            utils.setupSidebar(user);
+            await loadMyLoans();
+        });
+    </script>
+</body>
+</html>
