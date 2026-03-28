@@ -5,6 +5,7 @@ const BankProduct = require('../models/BankProduct');
 const { auth } = require('../middleware/auth');
 const { upload } = require('../middleware/upload');
 const { computeCreditScore } = require('../services/creditScoreService');
+const { sendAdminNewApplicationMail } = require('../services/emailService');
 
 const router = express.Router();
 
@@ -236,7 +237,22 @@ router.post('/loans/apply', auth('student'), async (req, res) => {
       bankProduct
     });
 
-    const populated = await Loan.findById(loan._id).populate('bank').populate('bankProduct');
+    const populated = await Loan.findById(loan._id)
+      .populate('student', 'name email')
+      .populate('bank')
+      .populate('bankProduct');
+
+    // Send email notification to Admin asynchronously
+    if (populated.student) {
+      sendAdminNewApplicationMail({
+        studentName: populated.student.name || 'Student',
+        studentEmail: populated.student.email,
+        loanAmount: requestedAmount,
+        loanType: loanType,
+        requestedTenure: tenureMonths
+      }).catch(err => console.error('[Email] Admin new application alert failed:', err.message));
+    }
+
     res.status(201).json(populated);
   } catch (err) {
     console.error(err);

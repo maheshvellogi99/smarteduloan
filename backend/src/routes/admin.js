@@ -3,6 +3,7 @@ const Loan = require('../models/Loan');
 const StudentProfile = require('../models/StudentProfile');
 const Bank = require('../models/Bank');
 const { auth } = require('../middleware/auth');
+const { sendBankApprovalMail } = require('../services/emailService');
 
 const router = express.Router();
 
@@ -169,10 +170,23 @@ router.post('/loans/:id/approve', auth('admin'), async (req, res) => {
     await loan.save();
 
     const populated = await Loan.findById(loan._id)
-      .populate('student')
+      .populate('student', 'name email')
       .populate('profile')
-      .populate('bank')
+      .populate({ path: 'bank', populate: { path: 'user', select: 'email' } })
       .populate('bankProduct');
+
+    // Send email to bank asynchronously
+    if (populated.bank && populated.bank.user && populated.student) {
+      sendBankApprovalMail({
+        bankUserEmail: populated.bank.user.email,
+        bankName: populated.bank.bankName || 'Partner Bank',
+        studentName: populated.student.name || 'Student',
+        studentEmail: populated.student.email,
+        loanAmount: populated.principalAmount,
+        loanType: populated.loanType
+      }).catch(err => console.error('[Email] Bank approval notice failed:', err.message));
+    }
+
     res.json(populated);
   } catch (err) {
     console.error(err);

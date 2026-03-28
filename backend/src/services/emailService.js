@@ -306,10 +306,64 @@ async function sendAdminDisbursalNoticeMail({ studentEmail, studentName, bankNam
   });
 }
 
+// ── Email 6: Admin — New Application Received ─────────────────────────────
+async function sendAdminNewApplicationMail({ studentName, studentEmail, loanAmount, loanType, requestedTenure }) {
+  const subject = `🆕 New Loan Application — ${studentName}`;
+
+  const body = `
+    <h2>New Loan Application Received</h2>
+    <p>A student has just submitted a new education loan application on SmartEduLoan.</p>
+
+    <div class="highlight">
+      <p><strong>Applicant:</strong> ${studentName} (${studentEmail})</p>
+      <p><strong>Requested Amount:</strong> ${fmt(loanAmount)}</p>
+      <p><strong>Loan Type:</strong> ${(loanType || '').toUpperCase()}</p>
+      <p><strong>Requested Tenure:</strong> ${requestedTenure} months</p>
+      <p><strong>Applied At:</strong> ${nowIST()}</p>
+    </div>
+
+    <p>Please log in to the <a href="http://localhost:5001/admin/applications.html">Admin Portal</a> to review this application.</p>`;
+
+  await silentSend({
+    from: `"SmartEduLoan" <${process.env.EMAIL_USER}>`,
+    to: process.env.ADMIN_EMAIL,
+    subject,
+    html: html(body)
+  });
+}
+
+// ── Email 7: Bank — Loan Approved by Admin ─────────────────────────────────
+async function sendBankApprovalMail({ bankUserEmail, bankName, studentName, studentEmail, loanAmount, loanType }) {
+  const subject = `📥 New Admin-Approved Application — ${studentName}`;
+
+  const body = `
+    <h2>Application Forwarded for Verification</h2>
+    <p>Dear <strong>${bankName}</strong> Team,</p>
+    <p>The SmartEduLoan Admin has approved and forwarded a student loan application for your final verification.</p>
+
+    <div class="highlight">
+      <p><strong>Applicant:</strong> ${studentName} (${studentEmail})</p>
+      <p><strong>Requested Amount:</strong> ${fmt(loanAmount)}</p>
+      <p><strong>Loan Type:</strong> ${(loanType || '').toUpperCase()}</p>
+      <p><strong>Forwarded At:</strong> ${nowIST()}</p>
+    </div>
+
+    <p>Please log in to the <a href="http://localhost:5001/bank/dashboard.html">Bank Portal</a> to review and verify this loan.</p>`;
+
+  await silentSend({
+    from: `"SmartEduLoan" <${process.env.EMAIL_USER}>`,
+    to: bankUserEmail,
+    subject,
+    html: html(body)
+  });
+}
+
 module.exports = {
   sendStudentVerificationMail,
   sendAdminVerificationMail,
   sendAdminDisbursalMail,
   sendDisbursalNoticeMail,
-  sendAdminDisbursalNoticeMail
+  sendAdminDisbursalNoticeMail,
+  sendAdminNewApplicationMail,
+  sendBankApprovalMail
 };
