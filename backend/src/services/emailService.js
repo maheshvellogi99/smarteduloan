@@ -187,7 +187,7 @@ async function sendAdminVerificationMail({ studentName, studentEmail, bankName, 
       <p><strong>Verified At:</strong> ${nowIST()}</p>
     </div>
 
-    <p>Please log in to the <a href="http://localhost:5001/admin/applications.html">Admin Portal</a> and approve or reject this application.</p>`;
+    <p>Please log in to the <a href="https://smarteduloan.vercel.app/#login-section">Admin Portal</a> and approve or reject this application.</p>`;
 
   await silentSend({
     from: `"SmartEduLoan" <${process.env.EMAIL_USER}>`,
@@ -296,7 +296,7 @@ async function sendAdminDisbursalNoticeMail({ studentEmail, studentName, bankNam
       ${bankNote ? `<p><strong>Bank Manager Note:</strong> ${bankNote}</p>` : ''}
     </div>
 
-    <p>Please log in to the <a href="http://localhost:5001/admin/applications.html">Admin Portal</a> and update the final loan records accordingly.</p>`;
+    <p>Please log in to the <a href="https://smarteduloan.vercel.app/#login-section">Admin Portal</a> and update the final loan records accordingly.</p>`;
 
   await silentSend({
     from: `"SmartEduLoan" <${process.env.EMAIL_USER}>`,
@@ -322,7 +322,7 @@ async function sendAdminNewApplicationMail({ studentName, studentEmail, loanAmou
       <p><strong>Applied At:</strong> ${nowIST()}</p>
     </div>
 
-    <p>Please log in to the <a href="http://localhost:5001/admin/applications.html">Admin Portal</a> to review this application.</p>`;
+    <p>Please log in to the <a href="https://smarteduloan.vercel.app/#login-section">Admin Portal</a> to review this application.</p>`;
 
   await silentSend({
     from: `"SmartEduLoan" <${process.env.EMAIL_USER}>`,
@@ -348,7 +348,7 @@ async function sendBankApprovalMail({ bankUserEmail, bankName, studentName, stud
       <p><strong>Forwarded At:</strong> ${nowIST()}</p>
     </div>
 
-    <p>Please log in to the <a href="http://localhost:5001/bank/dashboard.html">Bank Portal</a> to review and verify this loan.</p>`;
+    <p>Please log in to the <a href="https://smarteduloan.vercel.app/#login-section">Bank Portal</a> to review and verify this loan.</p>`;
 
   await silentSend({
     from: `"SmartEduLoan" <${process.env.EMAIL_USER}>`,
