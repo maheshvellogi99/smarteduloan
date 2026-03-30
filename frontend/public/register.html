@@ -104,7 +104,7 @@
                 </div>
                 <div class="form-group">
                     <label>Contact Phone</label>
-                    <input type="tel" id="reg-bank-phone" placeholder="+91 98765 43210" />
+                    <input type="tel" id="reg-bank-phone" placeholder="+91 98765 43210" required />
                 </div>
             </div>
 
@@ -124,6 +124,20 @@
                 const isBank = e.target.value === 'bank';
                 studentFields.style.display = isBank ? 'none' : 'block';
                 bankFields.className = isBank ? 'bank-fields visible' : 'bank-fields';
+
+                // Toggle required attributes for Student fields
+                document.getElementById('reg-name').required = !isBank;
+                document.getElementById('reg-email').required = !isBank;
+                document.getElementById('reg-password').required = !isBank;
+                document.getElementById('reg-password-confirm').required = !isBank;
+
+                // Toggle required attributes for Bank fields
+                document.getElementById('reg-bank-name').required = isBank;
+                document.getElementById('reg-bank-email').required = isBank;
+                document.getElementById('reg-bank-password').required = isBank;
+                document.getElementById('reg-bank-password-confirm').required = isBank;
+                document.getElementById('reg-license').required = isBank;
+                document.getElementById('reg-bank-phone').required = isBank;
             });
         });
 
