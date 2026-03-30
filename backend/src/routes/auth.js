@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, role, bankName, bankCode, age, dob } = req.body;
+    const { name, email, password, role, bankName, bankCode, contactPhone, age, dob } = req.body;
 
     const effectiveRole = role === 'admin' ? 'admin'
       : role === 'bank' ? 'bank' : 'student';
@@ -53,7 +53,8 @@ router.post('/register', async (req, res) => {
       await Bank.create({
         user: user._id,
         bankName: bankName.trim(),
-        bankCode: bankCode.trim()
+        bankCode: bankCode.trim(),
+        contactPhone: contactPhone ? contactPhone.trim() : undefined
       });
     }
 
