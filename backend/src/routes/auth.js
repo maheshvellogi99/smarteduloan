@@ -8,18 +8,18 @@ const router = express.Router();
 
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, role, bankName, bankBranchCode, age, dob } = req.body;
+    const { name, email, password, role, bankName, bankCode, age, dob } = req.body;
 
     const effectiveRole = role === 'admin' ? 'admin'
       : role === 'bank' ? 'bank' : 'student';
 
     if (effectiveRole === 'bank') {
-      if (!bankName || !bankBranchCode || !email || !password) {
+      if (!bankName || !bankCode || !email || !password) {
         return res.status(400).json({
           message: 'Bank name, branch code, branch email and password are required'
         });
       }
-      const existingBankCode = await Bank.findOne({ bankCode: bankBranchCode.trim() });
+      const existingBankCode = await Bank.findOne({ bankCode: bankCode.trim() });
       if (existingBankCode) {
         return res.status(409).json({ message: 'Bank branch code already registered' });
       }
@@ -53,7 +53,7 @@ router.post('/register', async (req, res) => {
       await Bank.create({
         user: user._id,
         bankName: bankName.trim(),
-        bankCode: bankBranchCode.trim()
+        bankCode: bankCode.trim()
       });
     }
 
