@@ -1,5 +1,109 @@
 // bank.js — all bank portal logic
 
+// ── Helper: resolve document URL (Cloudinary URL or local fallback) ──
+function getDocUrl(doc) {
+    if (!doc) return '#';
+    let url = doc.url;
+    if (!url) {
+        url = `${window.location.host.includes('localhost') || window.location.host.includes('127.0.0.1') ? 'http' : 'https'}://${window.location.host}/uploads/${doc.filename}`;
+    }
+    if (url && url.includes('cloudinary.com')) {
+        url = url.replace('http://', 'https://');
+    }
+    return url;
+}
+
+// ── Document Preview Modal ──────────────────────────────────────────
+function previewDocument(url, mimeType, docLabel) {
+    closePreview();
+
+    if (!mimeType) {
+        const ext = url.split('.').pop().toLowerCase();
+        if (['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext)) mimeType = 'image/jpeg';
+        else if (ext === 'pdf') mimeType = 'application/pdf';
+    }
+
+    const isImage = mimeType && mimeType.startsWith('image/');
+    const isPdf = mimeType === 'application/pdf';
+
+    let contentHtml;
+    if (isImage) {
+        contentHtml = `<div style="text-align:center;"><img src="${url}" alt="${docLabel || 'Document'}" style="max-width:100%; max-height:75vh; border-radius:10px; object-fit:contain; box-shadow: 0 10px 30px rgba(0,0,0,0.4);" onerror="this.parentElement.innerHTML='<p class=\\'text-muted\\'>Failed to load image. Try opening in a new tab.</p>'"/></div>`;
+    } else if (isPdf) {
+        if (!url.includes('localhost') && !url.includes('127.0.0.1') && url.includes('cloudinary.com')) {
+            // Cloudinary PDF: Render first page as JPG image to avoid security/iframe blocks
+            let previewUrl = url;
+            if (previewUrl.endsWith('.pdf')) {
+                previewUrl = previewUrl.replace(/\\.pdf$/, '.jpg');
+            } else if (!previewUrl.match(/\\.(jpg|jpeg|png|webp|gif)$/i)) {
+                previewUrl += '.jpg';
+            }
+            contentHtml = `<div style="text-align:center; position:relative;">
+                <img src="${previewUrl}" alt="${docLabel || 'PDF Preview'}" style="max-width:100%; max-height:75vh; border-radius:10px; object-fit:contain; box-shadow: 0 10px 30px rgba(0,0,0,0.4);" onerror="this.parentElement.innerHTML='<p class=\\'text-muted\\'>Failed to load PDF preview. Try opening in a new tab.</p>'"/>
+                <div class="text-xs text-muted" style="position:absolute; bottom:-25px; left:0; right:0; text-align:center;">
+                    Showing 1st page preview. <a href="${url}" target="_blank" style="color:#4f46e5; text-decoration:underline;">Click to view full PDF</a>.
+                </div>
+            </div>`;
+        } else {
+            // Localhost PDF: Native iframe
+            contentHtml = `
+                <div style="width:100%; height:75vh; position:relative;">
+                    <iframe src="${url}" style="width:100%; height:100%; border:none; border-radius:10px; background:#fff;" type="application/pdf"></iframe>
+                    <div class="text-xs text-muted" style="position:absolute; bottom:-25px; left:0; right:0; text-align:center;">
+                        Note: If nothing shows, it might be a download-only file. <a href="${url}" target="_blank" style="color:#4f46e5; text-decoration:underline;">Click here to open directly</a>.
+                    </div>
+                </div>
+            `;
+        }
+    } else {
+        contentHtml = `
+            <div class="empty-state">
+                <div class="empty-icon">📄</div>
+                <p>Preview not available for this file type.</p>
+                <p class="text-sm">Please use the button below to open it.</p>
+            </div>
+        `;
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'preview-modal';
+    modal.className = 'preview-modal';
+    modal.innerHTML = `
+        <div class="preview-overlay" onclick="closePreview()"></div>
+        <div class="preview-container">
+            <div class="preview-header">
+                <span class="preview-title">${docLabel || 'Document Preview'}</span>
+                <button class="preview-close-btn" onclick="closePreview()" title="Close">✕</button>
+            </div>
+            <div class="preview-body">
+                ${contentHtml}
+            </div>
+            <div class="preview-footer">
+                <a href="${url}" target="_blank" class="btn btn-outline btn-sm" style="font-size:0.8rem;">
+                    Open in New Tab ↗
+                </a>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => modal.classList.add('active'));
+}
+
+function closePreview() {
+    const modal = document.getElementById('preview-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 200);
+        document.body.style.overflow = '';
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closePreview();
+});
+
 let bankLoans = [];
 
 // ── Tab switcher ───────────────────────────────────────────────────────────
@@ -389,10 +493,10 @@ function renderBankLoansTable() {
                        ${doc.adminNote ? `<span style="font-size:0.7rem; color:var(--danger);">— ${doc.adminNote}</span>` : ''}
                      </div>
                    </div>
-                   <a href="http://localhost:5001/uploads/${doc.filename}" target="_blank"
-                      style="font-size:0.75rem; color:var(--primary); white-space:nowrap; border:1px solid rgba(79,70,229,0.2); padding:0.2rem 0.6rem; border-radius:var(--radius-sm);">
-                      View ↗
-                   </a>
+                   <button onclick="previewDocument('${getDocUrl(doc)}', '${doc.mimeType || ''}', '${(DOC_LABELS[doc.docType]||doc.docType).replace(/'/g, "\\'")}')"
+                      style="font-size:0.75rem; color:var(--primary); white-space:nowrap; border:1px solid rgba(79,70,229,0.2); background:transparent; padding:0.2rem 0.6rem; border-radius:var(--radius-sm); cursor:pointer;">
+                      👁 Preview
+                   </button>
                  </div>`).join('')}
                </div>`
         )}
