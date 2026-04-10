@@ -3,44 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartEduLoan — Applications</title>
+    <title>Applications — SmartEduLoan Admin</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/dashboard.css">
+    <style>
+        .table-responsive { overflow-x:auto; }
+    </style>
 </head>
 <body>
-    <div class="app-shell">
-        <aside class="sidebar" id="sidebar"></aside>
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
-        <div class="content-wrapper">
-            <div class="mobile-topbar" id="mobile-topbar"></div>
-            <main class="main-content">
-                <div class="page-header"><h1>Applications</h1></div>
-                <div class="admin-app-layout">
-                    <div class="glass-card">
-                        <div class="section-head">Application Queue</div>
-                        <div id="loans-loading" class="loading-msg">Loading applications...</div>
-                        <div id="loans-table"></div>
-                    </div>
-                    <div class="glass-card" id="review-panel" style="position:sticky; top:1rem;">
-                        <div id="review-empty" class="empty-state"><div class="empty-icon">📋</div><p>Select an application to review</p></div>
-                        <div id="review-content" style="display:none;"></div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
-    <nav class="bottom-nav" id="bottom-nav"></nav>
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <script src="/js/api.js"></script>
-    <script src="/js/utils.js"></script>
-    <script src="/js/admin.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const user = utils.checkAuth(['admin']);
-            if (!user) return;
-            utils.setupSidebar(user);
-            await loadAdminApplications();
-        });
-    </script>
+    <div class="content-wrapper">
+        <div class="mobile-topbar" id="mobile-topbar"></div>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Applications</h1>
+            </div>
+
+            <div id="loans-loading" class="loading-msg">Loading applications...</div>
+
+            <div class="admin-app-layout">
+                <!-- Applications Table -->
+                <div class="glass-card" id="loans-table"></div>
+
+                <!-- Review Panel -->
+                <div>
+                    <div class="glass-card" id="review-empty">
+                        <div class="empty-state" style="padding:2rem;">
+                            <div class="empty-icon">📋</div>
+                            <p>Select an application to review</p>
+                        </div>
+                    </div>
+                    <div class="glass-card" id="review-content" style="display:none;"></div>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav" id="bottom-nav"></nav>
+    </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/admin.js"></script>
+<script>
+    const user = utils.checkAuth(['admin']);
+    if (user) {
+        utils.setupSidebar(user);
+        loadAdminApplications();
+    }
+</script>
 </body>
 </html>

@@ -144,13 +144,13 @@ async function loadAdminDashboard() {
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { color: '#94a3b8', padding: 20, font: { family: "'Inter', sans-serif", size: 12, weight: '600' }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 }
+                            labels: { color: '#475569', padding: 20, font: { family: "'Inter', sans-serif", size: 12, weight: '600' }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 }
                         },
                         tooltip: {
-                            backgroundColor: '#1e1e2e',
-                            titleColor: '#e2e8f0',
-                            bodyColor: '#94a3b8',
-                            borderColor: 'rgba(255,255,255,0.1)',
+                            backgroundColor: '#1B1464',
+                            titleColor: '#fff',
+                            bodyColor: '#e2e8f0',
+                            borderColor: 'rgba(0,0,0,0.1)',
                             borderWidth: 1,
                             cornerRadius: 8,
                             padding: 12
@@ -164,12 +164,12 @@ async function loadAdminDashboard() {
                         const { ctx, chartArea: { width, height, top } } = chart;
                         ctx.save();
                         ctx.font = "700 1.75rem 'Outfit', sans-serif";
-                        ctx.fillStyle = '#e2e8f0';
+                        ctx.fillStyle = '#1B1464';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillText(data.totalLoans, width / 2 + chart.chartArea.left - chart.chartArea.left + chart.chartArea.left, top + height / 2 - 8);
                         ctx.font = "600 0.65rem 'Inter', sans-serif";
-                        ctx.fillStyle = '#64748b';
+                        ctx.fillStyle = '#94A3B8';
                         ctx.fillText('TOTAL', width / 2 + chart.chartArea.left - chart.chartArea.left + chart.chartArea.left, top + height / 2 + 16);
                         ctx.restore();
                     }
@@ -204,13 +204,13 @@ async function loadAdminDashboard() {
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { color: '#94a3b8', padding: 20, font: { family: "'Inter', sans-serif", size: 12, weight: '600' }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 }
+                            labels: { color: '#475569', padding: 20, font: { family: "'Inter', sans-serif", size: 12, weight: '600' }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 }
                         },
                         tooltip: {
-                            backgroundColor: '#1e1e2e',
-                            titleColor: '#e2e8f0',
-                            bodyColor: '#94a3b8',
-                            borderColor: 'rgba(255,255,255,0.1)',
+                            backgroundColor: '#1B1464',
+                            titleColor: '#fff',
+                            bodyColor: '#e2e8f0',
+                            borderColor: 'rgba(0,0,0,0.1)',
                             borderWidth: 1,
                             cornerRadius: 8,
                             padding: 12
@@ -224,12 +224,12 @@ async function loadAdminDashboard() {
                         const { ctx, chartArea: { width, height, top, left } } = chart;
                         ctx.save();
                         ctx.font = "700 1.75rem 'Outfit', sans-serif";
-                        ctx.fillStyle = '#e2e8f0';
+                        ctx.fillStyle = '#1B1464';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillText(riskTotal, left + width / 2, top + height / 2 - 8);
                         ctx.font = "600 0.65rem 'Inter', sans-serif";
-                        ctx.fillStyle = '#64748b';
+                        ctx.fillStyle = '#94A3B8';
                         ctx.fillText('APPLICANTS', left + width / 2, top + height / 2 + 16);
                         ctx.restore();
                     }
@@ -381,7 +381,7 @@ async function openReview(loanId) {
         <div id="review-msg" class="alert" style="display:none;"></div>
 
         <!-- Profile Stats -->
-        <div style="background:rgba(255,255,255,0.03); border-radius:0.5rem; padding:0.875rem; margin-bottom:0.75rem;">
+        <div style="background:var(--surface-2); border-radius:0.5rem; padding:0.875rem; margin-bottom:0.75rem;">
             <h4 class="text-muted text-sm" style="text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">Applicant</h4>
             <div class="review-stats-grid">
                 <div><span class="text-muted" style="font-size:0.7rem; display:block;">Credit Score</span><strong>${profile.creditScore || 'N/A'}</strong></div>
@@ -394,7 +394,7 @@ async function openReview(loanId) {
                 <div><span class="text-muted" style="font-size:0.7rem; display:block;">Academic Score</span><strong>${profile.academicScore||'N/A'}%</strong></div>
             </div>
             ${profile.jeeScore?.appeared ? `
-            <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid rgba(255,255,255,0.06);">
+            <div style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--border);">
                 <p class="text-muted" style="font-size:0.7rem; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.5rem;">JEE Score (${profile.jeeScore.year || '—'})</p>
                 <div class="grid gap-2" style="grid-template-columns: repeat(3,1fr); font-size:0.8rem;">
                     <div><span class="text-muted" style="font-size:0.65rem; display:block;">Mains Rank</span><strong>${profile.jeeScore.mainsRank || '—'}</strong></div>
@@ -405,7 +405,7 @@ async function openReview(loanId) {
         </div>
 
         <!-- Study Scores Cross-Check -->
-        <div style="background:rgba(255,255,255,0.03); border-radius:0.5rem; padding:0.875rem; margin-bottom:0.75rem;">
+        <div style="background:var(--surface-2); border-radius:0.5rem; padding:0.875rem; margin-bottom:0.75rem;">
             <h4 class="text-muted text-sm" style="text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">📊 Declared Study Scores</h4>
             ${studyScores.length === 0
                 ? '<p class="text-muted" style="font-size:0.8125rem;">No study scores declared.</p>'
@@ -427,7 +427,7 @@ async function openReview(loanId) {
         </div>
 
         <!-- KYC Documents with Preview + Verify/Reject -->
-        <div style="background:rgba(255,255,255,0.03); border-radius:0.5rem; padding:0.875rem; margin-bottom:0.75rem;">
+        <div style="background:var(--surface-2); border-radius:0.5rem; padding:0.875rem; margin-bottom:0.75rem;">
             <h4 class="text-muted text-sm" style="text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">📎 KYC Documents</h4>
             ${profileDocs.length === 0
                 ? '<p class="text-muted" style="font-size:0.8125rem;">No KYC documents uploaded yet.</p>'
@@ -436,7 +436,7 @@ async function openReview(loanId) {
                         const docUrl = getDocUrl(doc);
                         const docLabel = DOC_LABELS[doc.docType] || doc.docType;
                         return `
-                        <div style="background:rgba(255,255,255,0.03); border-radius:0.375rem; padding:0.625rem; border:1px solid rgba(255,255,255,0.05);" id="doc-row-${doc._id}">
+                        <div style="background:var(--surface-2); border-radius:0.375rem; padding:0.625rem; border:1px solid var(--border);" id="doc-row-${doc._id}">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.375rem;">
                                 <span style="font-size:0.8125rem; font-weight:500;">${docLabel}</span>
                                 <span class="badge badge-${doc.status==='verified'?'success':doc.status==='rejected'?'danger':'warning'}" id="doc-badge-${doc._id}" style="font-size:0.6rem;">${doc.status.toUpperCase()}</span>
@@ -462,13 +462,13 @@ async function openReview(loanId) {
 
         <!-- Loan Decision -->
         ${loan.status === 'pending' ? `
-        <div style="background:rgba(255,255,255,0.03); border-radius:0.5rem; padding:0.875rem;">
+        <div style="background:var(--surface-2); border-radius:0.5rem; padding:0.875rem;">
             <h4 class="text-muted text-sm" style="text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">Decision</h4>
             
-            <div style="background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.2); border-radius:0.5rem; padding:0.75rem; margin-bottom:0.75rem;">
-                <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:0.25rem;">Student's Selected Bank Product:</p>
+            <div style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.15); border-radius:0.5rem; padding:0.75rem; margin-bottom:0.75rem;">
+                <p style="font-size:0.75rem; color:#94A3B8; margin-bottom:0.25rem;">Student's Selected Bank Product:</p>
                 <p style="color:var(--success); font-weight:600; font-size:0.875rem;">${loan.bankProduct?.bankName || 'Unknown Bank'} – ${loan.bankProduct?.name || 'Unknown Product'}</p>
-                <p style="font-size:0.75rem; color:#94a3b8; margin-top:0.25rem;">Rate: ${loan.bankProduct?.interestRate || loan.interestRate}%</p>
+                <p style="font-size:0.75rem; color:#94A3B8; margin-top:0.25rem;">Rate: ${loan.bankProduct?.interestRate || loan.interestRate}%</p>
             </div>
 
             <div class="form-group">
@@ -486,7 +486,7 @@ async function openReview(loanId) {
             </div>
         </div>
         ` : loan.status === 'approved' ? `
-        <div style="text-align:center; padding:1rem; background:rgba(16,185,129,0.05); border-radius:0.5rem;">
+        <div style="text-align:center; padding:1rem; background:rgba(16,185,129,0.06); border-radius:0.5rem;">
             <p style="color:var(--success); font-weight:600; margin-bottom:0.75rem;">✓ Loan Approved</p>
             <button onclick="markDefaulter('${loanId}')" style="background:none; border:1px solid var(--danger); color:var(--danger); border-radius:0.5rem; padding:0.5rem 1rem; cursor:pointer; font-size:0.875rem; width:100%;">Flag as Defaulter</button>
         </div>
@@ -631,7 +631,7 @@ function renderBanksList(banks) {
     container.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:1rem;">
             ${banks.map(b => `
-                <div style="background:rgba(255,255,255,0.03); border-radius:0.5rem; padding:1rem; border:1px solid rgba(255,255,255,0.05);">
+                <div style="background:var(--surface-2); border-radius:0.5rem; padding:1rem; border:1px solid var(--border);">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                         <h4 style="font-weight:600;">${b.bankName}</h4>
                         <span class="badge badge-success" style="font-size:0.625rem;">${b.bankCode}</span>
@@ -640,7 +640,7 @@ function renderBanksList(banks) {
                     <div style="margin-top:0.75rem;">
                         <p class="text-muted text-sm" style="margin-bottom:0.25rem;">Products (${(b.products || []).length})</p>
                         ${(b.products || []).map(p => `
-                            <div style="font-size:0.75rem; color:#94a3b8; padding:0.25rem 0; border-bottom:1px solid rgba(255,255,255,0.03);">
+                            <div style="font-size:0.75rem; color:#94a3b8; padding:0.25rem 0; border-bottom:1px solid var(--border);">
                                 ${p.name} · ${p.interestRate}% · up to ${utils.formatCurrency(p.maxAmount)}
                             </div>
                         `).join('')}

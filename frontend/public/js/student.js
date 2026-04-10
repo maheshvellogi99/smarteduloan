@@ -141,8 +141,8 @@ async function loadStudentDashboard() {
         if (profile) {
             const score = profile.creditScore || 0;
             const pct = Math.min((score / 900) * 100, 100);
-            const riskColors = { low: '#10b981', medium: '#f59e0b', high: '#ef4444' };
-            const riskColor = riskColors[profile.riskCategory] || '#7c5cfc';
+            const riskColors = { low: '#059669', medium: '#D97706', high: '#DC2626' };
+            const riskColor = riskColors[profile.riskCategory] || '#4F46E5';
 
             // Center text
             document.getElementById('score-center-text').innerHTML = `
@@ -157,7 +157,7 @@ async function loadStudentDashboard() {
                     data: {
                         datasets: [{
                             data: [pct, 100 - pct],
-                            backgroundColor: [riskColor, 'rgba(255,255,255,0.06)'],
+                            backgroundColor: [riskColor, 'rgba(0,0,0,0.06)'],
                             borderWidth: 0,
                             borderRadius: 6
                         }]
@@ -173,7 +173,7 @@ async function loadStudentDashboard() {
 
             document.getElementById('score-info').innerHTML = `
                 <span style="display:inline-block; padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.75rem; font-weight:700;
-                    background: rgba(255,255,255,0.05); color: ${riskColor}; text-transform:uppercase;">
+                    background: rgba(0,0,0,0.04); color: ${riskColor}; text-transform:uppercase;">
                     ${profile.riskCategory} RISK
                 </span>
                 <p class="text-muted text-sm" style="margin-top:0.5rem;">Max Eligible: <strong>${utils.formatCurrency(profile.maxEligibleAmount)}</strong></p>
@@ -214,10 +214,10 @@ async function loadStudentDashboard() {
                         plugins: {
                             legend: {
                                 position: 'bottom',
-                                labels: { color: '#94a3b8', padding: 16, font: { family: "'Inter', sans-serif", size: 11, weight: '600' }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 }
+                                labels: { color: '#475569', padding: 16, font: { family: "'Inter', sans-serif", size: 11, weight: '600' }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 }
                             },
                             tooltip: {
-                                backgroundColor: '#1e1e2e', titleColor: '#e2e8f0', bodyColor: '#94a3b8',
+                                backgroundColor: '#1B1464', titleColor: '#fff', bodyColor: '#e2e8f0',
                                 borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, cornerRadius: 8, padding: 10
                             }
                         },
@@ -366,7 +366,7 @@ function setupProfileForm() {
         try {
             await api.post('/student/profile', body);
             msgDiv.className = 'alert';
-            msgDiv.style.cssText = 'display:block; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:#10b981; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
+            msgDiv.style.cssText = 'display:block; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.15); color:#059669; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
             msgDiv.textContent = '✅ Profile saved! Credit score updated. Now upload your documents in the Documents tab.';
         } catch (err) {
             msgDiv.className = 'alert alert-danger';
@@ -465,7 +465,7 @@ async function saveStudyScores() {
         });
 
         msgDiv.className = 'alert';
-        msgDiv.style.cssText = 'display:block; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:#10b981; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
+        msgDiv.style.cssText = 'display:block; background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.15); color:#059669; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
         msgDiv.textContent = `✅ ${studyScoresData.length} study score(s) and JEE details saved!`;
     } catch (err) {
         msgDiv.className = 'alert alert-danger';
@@ -640,7 +640,7 @@ async function loadApplyPage() {
 
         // ── Low credit score warning banner ─────────────────────────────────
         if (profile.creditScore < CREDIT_SCORE_THRESHOLD) {
-            msgDiv.style.cssText = 'display:block; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); color:#fca5a5; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
+            msgDiv.style.cssText = 'display:block; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.15); color:#DC2626; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
             msgDiv.innerHTML = `
                 <strong>⚠️ Low Credit Score Warning</strong><br>
                 Your credit score is <strong>${profile.creditScore}</strong>, which is below the minimum required threshold of <strong>${CREDIT_SCORE_THRESHOLD}</strong>.
@@ -680,7 +680,7 @@ async function loadApplyPage() {
 
             const bankProductId = document.getElementById('bankProductId').value;
             if (!bankProductId) {
-                msgDiv.style.cssText = 'display:block; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); color:#fca5a5; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
+                msgDiv.style.cssText = 'display:block; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.15); color:#DC2626; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
                 msgDiv.textContent = 'Please select a bank product to proceed.';
                 btn.disabled = false;
                 btn.textContent = 'Submit Application';
@@ -700,7 +700,7 @@ async function loadApplyPage() {
 
                 // ── Auto-rejected response ────────────────────────────────────
                 if (result.autoRejected) {
-                    msgDiv.style.cssText = 'display:block; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); color:#fca5a5; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
+                    msgDiv.style.cssText = 'display:block; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.15); color:#DC2626; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
                     msgDiv.innerHTML = `<strong>❌ Loan Automatically Rejected</strong><br>${result.rejectionReason}<br><br><a href="/student/loans.html" style="color:#f87171;">View your loan history →</a>`;
                     btn.disabled = false;
                     btn.textContent = 'Submit Application';
@@ -711,7 +711,7 @@ async function loadApplyPage() {
                 utils.showToast('Loan application submitted successfully!');
                 setTimeout(() => { window.location.href = '/student/loans.html'; }, 1200);
             } catch (err) {
-                msgDiv.style.cssText = 'display:block; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); color:#fca5a5; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
+                msgDiv.style.cssText = 'display:block; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.15); color:#DC2626; padding:1rem; border-radius:0.5rem; margin-bottom:1rem;';
                 msgDiv.textContent = err.response?.data?.message || 'Failed to submit application';
                 btn.disabled = false;
                 btn.textContent = 'Submit Application';
@@ -854,15 +854,15 @@ function renderLoanCard(loan) {
 
     const buildTimelineStep = (s, i) => {
         const isLast = i === tlSteps.length - 1;
-        const dotBg    = s.done ? (s.fail ? '#ef4444' : '#10b981') : 'rgba(255,255,255,0.04)';
-        const dotBord  = s.done ? (s.fail ? '#ef4444' : '#10b981') : 'rgba(255,255,255,0.2)';
-        const dotGlow  = s.done ? (s.fail ? 'box-shadow:0 0 10px rgba(239,68,68,0.5);' : 'box-shadow:0 0 10px rgba(16,185,129,0.5);') : '';
-        const lblColor = s.done ? (s.fail ? '#fca5a5' : '#e2e8f0') : 'var(--text-muted)';
+        const dotBg    = s.done ? (s.fail ? '#EF4444' : '#10B981') : '#F0F2F8';
+        const dotBord  = s.done ? (s.fail ? '#EF4444' : '#10B981') : 'rgba(0,0,0,0.12)';
+        const dotGlow  = s.done ? (s.fail ? 'box-shadow:0 0 10px rgba(239,68,68,0.3);' : 'box-shadow:0 0 10px rgba(16,185,129,0.3);') : '';
+        const lblColor = s.done ? (s.fail ? '#DC2626' : '#1B1464') : 'var(--text-muted)';
         const lineGrad = s.done && !s.fail
-            ? 'linear-gradient(to bottom,#10b981,rgba(255,255,255,0.08))'
+            ? 'linear-gradient(to bottom,#10B981,rgba(0,0,0,0.06))'
             : s.fail
-            ? 'linear-gradient(to bottom,#ef4444,rgba(255,255,255,0.08))'
-            : 'rgba(255,255,255,0.08)';
+            ? 'linear-gradient(to bottom,#EF4444,rgba(0,0,0,0.06))'
+            : 'rgba(0,0,0,0.06)';
         const dateStr  = s.date
             ? '<span style="font-size:0.72rem;color:var(--text-muted);margin-top:3px;display:block;">📅 ' + utils.formatDate(s.date) + '</span>'
             : '';
@@ -885,7 +885,7 @@ function renderLoanCard(loan) {
             + '</div>';
     };
 
-    const timeline = '<div style="margin:1rem 0 0.5rem;padding:1rem 1.25rem;background:rgba(0,0,0,0.15);border:1px solid rgba(255,255,255,0.07);border-radius:0.75rem;">'
+    const timeline = '<div style="margin:1rem 0 0.5rem;padding:1rem 1.25rem;background:#F8F9FC;border:1px solid rgba(0,0,0,0.06);border-radius:0.75rem;">'
         + '<div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:0.875rem;">📍 Loan Journey</div>'
         + tlSteps.map(buildTimelineStep).join('')
         + '</div>';

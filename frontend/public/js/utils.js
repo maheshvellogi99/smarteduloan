@@ -78,20 +78,30 @@ function closeSidebar() {
 function setupSidebar(user) {
     if (!user) return;
 
+    const icons = {
+        dashboard: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>',
+        profile: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>',
+        apply: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>',
+        loans: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>',
+        applications: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="9.01" y2="15"></line><polyline points="9 11 9 11.01 10 11"></polyline></svg>',
+        banks: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><line x1="4" y1="10" x2="20" y2="10"></line><line x1="10" y1="4" x2="10" y2="20"></line></svg>',
+        brand: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary);"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>'
+    };
+
     const navConfig = {
         student: [
-            { href: '/student/dashboard.html', icon: '📊', label: 'Dashboard' },
-            { href: '/student/profile.html',   icon: '👤', label: 'Credit Profile' },
-            { href: '/student/apply.html',     icon: '📝', label: 'Apply Loan' },
-            { href: '/student/loans.html',     icon: '💳', label: 'My Loans' }
+            { href: '/student/dashboard.html', icon: icons.dashboard, label: 'Dashboard' },
+            { href: '/student/profile.html',   icon: icons.profile, label: 'Credit Profile' },
+            { href: '/student/apply.html',     icon: icons.apply, label: 'Apply Loan' },
+            { href: '/student/loans.html',     icon: icons.loans, label: 'My Loans' }
         ],
         admin: [
-            { href: '/admin/dashboard.html',    icon: '📊', label: 'Overview' },
-            { href: '/admin/applications.html', icon: '📋', label: 'Applications' },
-            { href: '/admin/banks.html',        icon: '🏦', label: 'Banks' }
+            { href: '/admin/dashboard.html',    icon: icons.dashboard, label: 'Overview' },
+            { href: '/admin/applications.html', icon: icons.applications, label: 'Applications' },
+            { href: '/admin/banks.html',        icon: icons.banks, label: 'Banks' }
         ],
         bank: [
-            { href: '/bank/dashboard.html', icon: '🏠', label: 'Dashboard' }
+            { href: '/bank/dashboard.html', icon: icons.dashboard, label: 'Dashboard' }
         ]
     };
 
@@ -102,7 +112,7 @@ function setupSidebar(user) {
     // Build sidebar HTML
     const sidebarHTML = `
         <a href="/${user.role}/dashboard.html" class="sidebar-brand">
-            <div class="brand-icon">🎓</div>
+            <div class="brand-icon" style="background:var(--primary-dim); border-radius:0.5rem; padding:0.3rem;">${icons.brand}</div>
             <div class="brand-text"><span>Smart</span>EduLoan</div>
         </a>
         <nav class="sidebar-nav">

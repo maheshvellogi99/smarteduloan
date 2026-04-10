@@ -1,196 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartEduLoan — Register</title>
+    <title>Create Account — SmartEduLoan</title>
+    <meta name="description" content="Register as a student or bank partner on SmartEduLoan.">
     <link rel="stylesheet" href="/css/style.css">
     <style>
-        body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem 1rem; background: #030303; }
-        body::before {
-            content:''; position:fixed; inset:0; z-index:0;
-            background: radial-gradient(ellipse 600px 400px at 30% 20%, rgba(124,92,252,0.05), transparent 70%),
-                        radial-gradient(ellipse 400px 300px at 70% 70%, rgba(52,211,153,0.03), transparent 70%);
+        body {
+            background: #F8F9FC;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
         }
+
+        .register-wrapper {
+            width: 100%;
+            max-width: 440px;
+            animation: slideUp 0.5s var(--ease);
+        }
+
+        .register-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            text-decoration: none;
+        }
+
+        .register-brand .icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #4F46E5, #6366F1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .register-brand span {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1B1464;
+        }
+
+        .register-brand span em {
+            font-style: normal;
+            color: #4F46E5;
+        }
+
         .register-card {
-            position:relative; z-index:1; width:100%; max-width:560px;
-            background: var(--surface-1); border:1px solid var(--border);
-            border-radius: var(--radius-xl); padding:2.5rem;
-            box-shadow: var(--shadow-lg);
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.03);
         }
-        .register-card h1 { font-size:1.625rem; font-weight:700; margin-bottom:0.375rem; }
-        .register-card .sub { font-size:0.875rem; color:var(--text-muted); margin-bottom:2rem; }
 
-        .role-toggle { display:flex; gap:4px; padding:4px; background:var(--surface-2); border-radius:var(--radius); margin-bottom:2rem; }
-        .role-toggle label { flex:1; text-align:center; padding:0.6rem; border-radius:var(--radius-sm); font-size:0.8125rem; font-weight:600; cursor:pointer; color:var(--text-muted); transition:all 0.25s var(--ease); }
-        .role-toggle input { display:none; }
-        .role-toggle input:checked + label { background:var(--surface-1); color:#fff; box-shadow:var(--shadow-sm); }
+        .register-card h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1B1464;
+            margin-bottom: 0.375rem;
+            text-align: center;
+        }
 
-        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-        .register-card .btn-primary { width:100%; padding:0.75rem; margin-top:0.5rem; }
-        .register-card .footer { text-align:center; margin-top:1.25rem; font-size:0.8125rem; color:var(--text-muted); }
-        .register-card .footer a { color:var(--primary-light); font-weight:600; }
-        .bank-fields { display:none; }
-        .bank-fields.visible { display:block; }
-        @media(max-width:600px) { .form-row { grid-template-columns:1fr; } .register-card { padding:1.75rem; } }
+        .register-card .subtitle {
+            text-align: center;
+            color: #64748B;
+            font-size: 0.9375rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .role-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-toggle button {
+            flex: 1;
+            padding: 0.625rem;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: #F8F9FC;
+            border-radius: var(--radius);
+            color: #94A3B8;
+            font-weight: 600;
+            font-size: 0.8125rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .role-toggle button.active {
+            background: var(--primary-dim);
+            border-color: rgba(79, 70, 229, 0.2);
+            color: var(--primary);
+        }
+
+        .bank-fields {
+            display: none;
+            animation: slideDown 0.3s var(--ease);
+        }
+
+        .bank-fields.show {
+            display: block;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.06);
+            border: 1px solid rgba(239, 68, 68, 0.12);
+            color: #DC2626;
+            padding: 0.625rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.8125rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 1.25rem;
+            font-size: 0.8125rem;
+            color: #94A3B8;
+        }
+
+        .register-footer a {
+            color: var(--primary);
+            font-weight: 600;
+        }
     </style>
 </head>
+
 <body>
-    <div class="register-card">
-        <a href="/" style="display:inline-flex;align-items:center;gap:0.5rem;font-size:0.8125rem;color:var(--text-muted);margin-bottom:1.5rem;text-decoration:none;">← Back to Home</a>
-        <h1>Create an Account</h1>
-        <p class="sub">Join SmartEduLoan as a student or partner bank.</p>
+    <div class="register-wrapper">
+        <a href="/" class="register-brand">
+            <div class="icon">🎓</div>
+            <span><em>Smart</em>EduLoan</span>
+        </a>
 
-        <div class="error-message" id="reg-error" style="background:var(--danger-dim);border:1px solid rgba(248,113,113,0.12);color:var(--danger);padding:0.625rem 0.75rem;border-radius:var(--radius-sm);font-size:0.8125rem;margin-bottom:1rem;display:none;"></div>
+        <div class="register-card">
+            <h1>Create Account</h1>
+            <p class="subtitle">Join SmartEduLoan as a student or bank partner</p>
 
-        <!-- Role toggle -->
-        <div class="role-toggle">
-            <input type="radio" name="role" id="role-student" value="student" checked>
-            <label for="role-student">🎒 Student</label>
-            <input type="radio" name="role" id="role-bank" value="bank">
-            <label for="role-bank">🏦 Partner Bank</label>
-        </div>
-
-        <form id="register-form">
-            <!-- Student fields -->
-            <div id="student-fields">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="reg-name" placeholder="John Doe" required />
-                    </div>
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" id="reg-email" placeholder="you@email.com" required />
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="reg-password" placeholder="Min. 6 characters" required minlength="6" />
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm Password</label>
-                        <input type="password" id="reg-password-confirm" placeholder="••••••••" required minlength="6" />
-                    </div>
-                </div>
+            <!-- Role Toggle -->
+            <div class="role-toggle">
+                <button type="button" id="toggle-student" class="active" onclick="setRole('student')">🎒
+                    Student</button>
+                <button type="button" id="toggle-bank" onclick="setRole('bank')">🏦 Bank Partner</button>
             </div>
 
-            <!-- Bank fields -->
-            <div id="bank-fields" class="bank-fields">
-                <div class="form-row">
+            <div class="error-message" id="error-message"></div>
+
+            <form id="register-form">
+                <input type="hidden" id="reg-role" value="student" />
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="reg-name" placeholder="Enter your full name" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="reg-email" placeholder="you@example.com" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="reg-password" placeholder="Minimum 6 characters" required
+                        minlength="6" />
+                </div>
+
+                <!-- Bank-specific fields -->
+                <div class="bank-fields" id="bank-fields">
                     <div class="form-group">
                         <label>Bank Name</label>
-                        <input type="text" id="reg-bank-name" placeholder="e.g. State Bank of India" />
+                        <input type="text" id="reg-bankName" placeholder="e.g. State Bank of India" />
                     </div>
                     <div class="form-group">
-                        <label>Bank Email</label>
-                        <input type="email" id="reg-bank-email" placeholder="admin@bank.com" />
+                        <label>Bank Code</label>
+                        <input type="text" id="reg-bankCode" placeholder="e.g. SBI" />
                     </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="reg-bank-password" placeholder="Min. 6 characters" minlength="6" />
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm Password</label>
-                        <input type="password" id="reg-bank-password-confirm" placeholder="••••••••" minlength="6" />
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>License Number</label>
-                    <input type="text" id="reg-license" placeholder="Bank license or registration #" />
-                </div>
-                <div class="form-group">
-                    <label>Contact Phone</label>
-                    <input type="tel" id="reg-bank-phone" placeholder="+91 98765 43210" required />
-                </div>
-            </div>
 
-            <button type="submit" class="btn btn-primary" id="reg-btn">Create Account</button>
-        </form>
-        <div class="footer">Already have an account? <a href="/#login-section">Sign In</a></div>
+                <button type="submit" id="reg-submit-btn" class="btn btn-primary btn-block btn-lg">Create
+                    Account</button>
+            </form>
+
+            <div class="register-footer">
+                Already have an account? <a href="/#login-section">Sign In</a>
+            </div>
+        </div>
     </div>
 
     <script src="/js/api.js"></script>
+    <script src="/js/utils.js"></script>
     <script>
-        const roleInputs = document.querySelectorAll('input[name="role"]');
-        const studentFields = document.getElementById('student-fields');
-        const bankFields = document.getElementById('bank-fields');
+        function setRole(role) {
+            document.getElementById('reg-role').value = role;
+            document.getElementById('toggle-student').classList.toggle('active', role === 'student');
+            document.getElementById('toggle-bank').classList.toggle('active', role === 'bank');
 
-        roleInputs.forEach(input => {
-            input.addEventListener('change', (e) => {
-                const isBank = e.target.value === 'bank';
-                studentFields.style.display = isBank ? 'none' : 'block';
-                bankFields.className = isBank ? 'bank-fields visible' : 'bank-fields';
-
-                // Toggle required attributes for Student fields
-                document.getElementById('reg-name').required = !isBank;
-                document.getElementById('reg-email').required = !isBank;
-                document.getElementById('reg-password').required = !isBank;
-                document.getElementById('reg-password-confirm').required = !isBank;
-
-                // Toggle required attributes for Bank fields
-                document.getElementById('reg-bank-name').required = isBank;
-                document.getElementById('reg-bank-email').required = isBank;
-                document.getElementById('reg-bank-password').required = isBank;
-                document.getElementById('reg-bank-password-confirm').required = isBank;
-                document.getElementById('reg-license').required = isBank;
-                document.getElementById('reg-bank-phone').required = isBank;
-            });
-        });
+            const bankFields = document.getElementById('bank-fields');
+            if (role === 'bank') {
+                bankFields.classList.add('show');
+            } else {
+                bankFields.classList.remove('show');
+            }
+        }
 
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('reg-btn');
-            const errorEl = document.getElementById('reg-error');
-            errorEl.style.display = 'none';
+            const btn = document.getElementById('reg-submit-btn');
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.style.display = 'none';
             btn.disabled = true;
-            btn.textContent = 'Creating...';
+            btn.textContent = 'Registering...';
 
-            const role = document.querySelector('input[name="role"]:checked').value;
+            const role = document.getElementById('reg-role').value;
+            const payload = {
+                role: role,
+                name: document.getElementById('reg-name').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-password').value
+            };
+
+            if (role === 'bank') {
+                payload.bankName = document.getElementById('reg-bankName').value;
+                payload.bankCode = document.getElementById('reg-bankCode').value;
+
+                if (!payload.bankName || !payload.bankCode) {
+                    errorDiv.textContent = 'Bank name and code are required.';
+                    errorDiv.style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = 'Create Account';
+                    return;
+                }
+            }
 
             try {
-                let res;
-                if (role === 'student') {
-                    const pw = document.getElementById('reg-password').value;
-                    const confirm = document.getElementById('reg-password-confirm').value;
-                    if (pw !== confirm) throw { message: 'Passwords do not match' };
-
-                    res = await api.post('/auth/register', {
-                        name: document.getElementById('reg-name').value,
-                        email: document.getElementById('reg-email').value,
-                        password: pw,
-                        role: 'student'
-                    });
-                } else {
-                    const pw = document.getElementById('reg-bank-password').value;
-                    const confirm = document.getElementById('reg-bank-password-confirm').value;
-                    if (pw !== confirm) throw { message: 'Passwords do not match' };
-
-                    res = await api.post('/auth/register', {
-                        name: document.getElementById('reg-bank-name').value,
-                        email: document.getElementById('reg-bank-email').value,
-                        password: pw,
-                        role: 'bank',
-                        bankName: document.getElementById('reg-bank-name').value,
-                        bankCode: document.getElementById('reg-license').value,
-                        contactPhone: document.getElementById('reg-bank-phone').value
-                    });
-                }
-
-                const data = res.data;
-                localStorage.setItem('token', data.token);
-                localStorage.setItem('user', JSON.stringify(data.user));
-                window.location.href = `/${data.user.role}/dashboard.html`;
+                const res = await api.post('/auth/register', payload);
+                localStorage.setItem('token', res.data.token);
+                localStorage.setItem('user', JSON.stringify(res.data.user));
+                window.location.href = `/${role}/dashboard.html`;
             } catch (err) {
-                errorEl.textContent = err.response?.data?.message || err.message || 'Registration failed';
-                errorEl.style.display = 'block';
+                errorDiv.textContent = err.response?.data?.message || err.message || 'Registration failed';
+                errorDiv.style.display = 'block';
+            } finally {
                 btn.disabled = false;
                 btn.textContent = 'Create Account';
             }
         });
     </script>
 </body>
+
 </html>

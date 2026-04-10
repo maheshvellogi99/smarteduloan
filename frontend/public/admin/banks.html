@@ -3,38 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartEduLoan — Manage Banks</title>
+    <title>Banks — SmartEduLoan Admin</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/dashboard.css">
 </head>
 <body>
-    <div class="app-shell">
-        <aside class="sidebar" id="sidebar"></aside>
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
-        <div class="content-wrapper">
-            <div class="mobile-topbar" id="mobile-topbar"></div>
-            <main class="main-content">
-                <div class="page-header"><h1>Partner Banks</h1></div>
-                <p class="text-muted text-sm" style="margin-top:-1.5rem; margin-bottom:1.75rem;">Banks register via the registration page. Review and manage their status below.</p>
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <div class="content-wrapper">
+        <div class="mobile-topbar" id="mobile-topbar"></div>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Partner Banks</h1>
+            </div>
+
+            <div id="banks-loading" class="loading-msg">Loading banks...</div>
+
+            <div class="dashboard-row">
+                <!-- Banks List -->
                 <div class="glass-card">
-                    <div id="banks-loading" class="loading-msg">Loading banks...</div>
+                    <div class="section-head">Registered Banks</div>
                     <div id="banks-list"></div>
                 </div>
-            </main>
-        </div>
-    </div>
-    <nav class="bottom-nav" id="bottom-nav"></nav>
 
-    <script src="/js/api.js"></script>
-    <script src="/js/utils.js"></script>
-    <script src="/js/admin.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const user = utils.checkAuth(['admin']);
-            if (!user) return;
-            utils.setupSidebar(user);
-            await loadAdminBanks();
-        });
-    </script>
+                <!-- Add Bank Form -->
+                <div class="glass-card">
+                    <div class="section-head">Add New Bank</div>
+                    <div id="bank-form-msg" style="display:none;" class="alert"></div>
+                    <form id="add-bank-form">
+                        <div class="form-group">
+                            <label>Bank Name</label>
+                            <input type="text" id="bankName" placeholder="e.g. State Bank of India" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Bank Code</label>
+                            <input type="text" id="bankCode" placeholder="e.g. SBI" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input type="text" id="bankAddress" placeholder="Branch address" />
+                        </div>
+                        <button type="submit" id="add-bank-btn" class="btn btn-primary btn-block">Add Bank</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav" id="bottom-nav"></nav>
+    </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/admin.js"></script>
+<script>
+    const user = utils.checkAuth(['admin']);
+    if (user) {
+        utils.setupSidebar(user);
+        loadAdminBanks();
+    }
+</script>
 </body>
 </html>

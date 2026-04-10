@@ -3,138 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartEduLoan — Student Dashboard</title>
+    <title>Dashboard — SmartEduLoan</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/dashboard.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head>
 <body>
-    <div class="app-shell">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar"></aside>
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-        <!-- Main -->
-        <div class="content-wrapper">
-            <div class="mobile-topbar" id="mobile-topbar"></div>
+    <div class="content-wrapper">
+        <div class="mobile-topbar" id="mobile-topbar"></div>
 
-            <main class="main-content">
-                <div class="page-header">
-                    <div>
-                        <h1 id="greeting">Dashboard</h1>
-                        <p class="text-muted text-sm mt-2" id="greeting-sub">Welcome back</p>
+        <main class="main-content">
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <a href="/student/apply.html" class="btn btn-primary">+ Apply for Loan</a>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading-msg">Loading your dashboard...</div>
+
+            <!-- Dashboard Content -->
+            <div id="dashboard-content" style="display:none;">
+                <!-- Stat Cards -->
+                <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <!-- Credit Score Widget -->
+                    <div class="stat-card stat-card-primary" id="score-widget">
+                        <div class="stat-label">Credit Score</div>
+                        <div style="position:relative; width:140px; margin:0.75rem auto;">
+                            <canvas id="credit-score-chart" width="140" height="140"></canvas>
+                            <div id="score-center-text" style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;"></div>
+                        </div>
+                        <div id="score-info" style="text-align:center;"></div>
                     </div>
-                    <a href="/student/apply.html" class="btn btn-primary">Apply for Loan →</a>
-                </div>
-
-                <div id="loading">
-                    <div class="stat-grid">
-                        <div class="skeleton skeleton-card"></div>
-                        <div class="skeleton skeleton-card"></div>
-                        <div class="skeleton skeleton-card"></div>
-                    </div>
-                    <div class="skeleton skeleton-card" style="height:200px; margin-top:1rem;"></div>
-                </div>
-
-                <div id="dashboard-content" style="display:none;">
-                    <!-- Stats Row -->
-                    <div class="dashboard-row" style="grid-template-columns: 1fr 1fr 1fr; align-items:stretch;">
-                        <!-- Credit Score Card -->
-                        <div class="stat-card stat-card-primary" id="score-widget" style="display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-                            <div class="stat-label" style="margin-bottom:1rem;">Credit Score</div>
-                            <div style="position:relative; width:140px; height:140px; margin:0 auto;">
-                                <canvas id="credit-score-chart" width="140" height="140"></canvas>
-                                <div id="score-center-text" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
-                                    <span style="font-size:2rem; font-weight:700; color:var(--text);">—</span>
-                                </div>
-                            </div>
-                            <div id="score-info" style="margin-top:1rem;"></div>
-                        </div>
-                        <div id="no-profile-msg" style="display:none;">
-                            <div class="stat-card stat-card-primary" style="text-align:center; padding:2rem; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                                <div style="font-size:2rem; margin-bottom:0.75rem;">📋</div>
-                                <p class="text-muted text-sm" style="margin-bottom:1rem;">No credit profile yet</p>
-                                <a href="/student/profile.html" class="btn btn-primary btn-sm">Build Profile</a>
-                            </div>
-                        </div>
-
-                        <!-- Active Loans -->
-                        <div class="stat-card stat-card-success">
-                            <div class="stat-icon-circle ico-success">💳</div>
-                            <div class="stat-label">Active Loans</div>
-                            <div class="stat-value stat-value-animated" id="active-loans-count">0</div>
-                        </div>
-
-                        <!-- Pending -->
-                        <div class="stat-card stat-card-warning">
-                            <div class="stat-icon-circle ico-warning">⏳</div>
-                            <div class="stat-label">Pending</div>
-                            <div class="stat-value stat-value-animated" id="pending-loans-count">0</div>
+                    <div id="no-profile-msg" style="display:none;" class="stat-card">
+                        <div class="empty-state" style="padding:2rem 1rem;">
+                            <div class="empty-icon">📝</div>
+                            <p>Complete your Credit Profile to view your score.</p>
+                            <a href="/student/profile.html" class="btn btn-primary btn-sm" style="margin-top:0.5rem;">Build Profile</a>
                         </div>
                     </div>
 
-                    <!-- Chart + Recent Table Row -->
-                    <div class="dashboard-row cols-1-3">
-                        <!-- Loan Distribution Chart -->
-                        <div class="chart-card" id="loan-chart-card" style="display:none;">
-                            <div class="chart-title">Loan Status</div>
-                            <div class="chart-wrapper">
-                                <canvas id="chart-loan-status"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Recent Loans Table -->
-                        <div class="glass-card">
-                            <div class="section-head">Recent Applications</div>
-                            <div id="loans-table-container">
-                                <p class="text-muted text-center" style="padding:2rem 0;">No loans yet.</p>
-                            </div>
-                        </div>
+                    <!-- Active Loans -->
+                    <div class="stat-card stat-card-success">
+                        <div class="stat-icon-circle ico-success">✅</div>
+                        <div class="stat-label">Active Loans</div>
+                        <div class="stat-value" id="active-loans-count">0</div>
+                        <div class="stat-sub">Approved & funded</div>
                     </div>
 
-                    <!-- Quick Actions -->
-                    <div class="dashboard-row" style="grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:0.5rem;">
-                        <a href="/student/profile.html" class="stat-card stat-card-info" style="text-decoration:none; text-align:center; padding:1.25rem; cursor:pointer;">
-                            <div class="stat-icon-circle ico-info" style="margin:0 auto 0.5rem;">👤</div>
-                            <div style="font-weight:600; font-size:0.8125rem; color:var(--text);">Credit Profile</div>
-                            <div class="text-muted" style="font-size:0.7rem; margin-top:0.25rem;">View & update your profile</div>
-                        </a>
-                        <a href="/student/apply.html" class="stat-card stat-card-success" style="text-decoration:none; text-align:center; padding:1.25rem; cursor:pointer;">
-                            <div class="stat-icon-circle ico-success" style="margin:0 auto 0.5rem;">📝</div>
-                            <div style="font-weight:600; font-size:0.8125rem; color:var(--text);">Apply for Loan</div>
-                            <div class="text-muted" style="font-size:0.7rem; margin-top:0.25rem;">Start a new application</div>
-                        </a>
-                        <a href="/student/loans.html" class="stat-card stat-card-warning" style="text-decoration:none; text-align:center; padding:1.25rem; cursor:pointer;">
-                            <div class="stat-icon-circle ico-warning" style="margin:0 auto 0.5rem;">📋</div>
-                            <div style="font-weight:600; font-size:0.8125rem; color:var(--text);">My Loans</div>
-                            <div class="text-muted" style="font-size:0.7rem; margin-top:0.25rem;">Track your applications</div>
-                        </a>
+                    <!-- Pending -->
+                    <div class="stat-card stat-card-warning">
+                        <div class="stat-icon-circle ico-warning">⏳</div>
+                        <div class="stat-label">Pending</div>
+                        <div class="stat-value" id="pending-loans-count">0</div>
+                        <div class="stat-sub">Awaiting review</div>
                     </div>
                 </div>
-            </main>
-        </div>
+
+                <!-- Charts + Recent Table -->
+                <div class="dashboard-row">
+                    <!-- Loan Status Chart -->
+                    <div class="chart-card" id="loan-chart-card" style="display:none;">
+                        <div class="chart-title">Loan Status Distribution</div>
+                        <div class="chart-wrapper">
+                            <canvas id="chart-loan-status"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Loans Table -->
+                    <div class="chart-card">
+                        <div class="chart-title">Recent Applications</div>
+                        <div id="loans-table-container">
+                            <p class="text-muted text-center" style="padding:2rem 0;">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="section-head">Quick Actions</div>
+                <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
+                    <a href="/student/profile.html" class="stat-card" style="text-decoration:none; text-align:center;">
+                        <div style="font-size:1.5rem; margin-bottom:0.5rem;">👤</div>
+                        <div class="stat-label">Credit Profile</div>
+                        <div class="stat-sub">Upload docs & manage scores</div>
+                    </a>
+                    <a href="/student/apply.html" class="stat-card" style="text-decoration:none; text-align:center;">
+                        <div style="font-size:1.5rem; margin-bottom:0.5rem;">📝</div>
+                        <div class="stat-label">Apply for Loan</div>
+                        <div class="stat-sub">Compare bank products</div>
+                    </a>
+                    <a href="/student/loans.html" class="stat-card" style="text-decoration:none; text-align:center;">
+                        <div style="font-size:1.5rem; margin-bottom:0.5rem;">💳</div>
+                        <div class="stat-label">My Loans</div>
+                        <div class="stat-sub">Track your applications</div>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav" id="bottom-nav"></nav>
     </div>
+</div>
 
-    <!-- Bottom Nav (Mobile) -->
-    <nav class="bottom-nav" id="bottom-nav"></nav>
-
-    <script src="/js/api.js"></script>
-    <script src="/js/utils.js"></script>
-    <script src="/js/student.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const user = utils.checkAuth(['student']);
-            if (!user) return;
-            utils.setupSidebar(user);
-
-            // Personalize greeting
-            const hour = new Date().getHours();
-            const greetWord = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
-            document.getElementById('greeting').textContent = `${greetWord}, ${user.name?.split(' ')[0] || 'Student'}`;
-            document.getElementById('greeting-sub').textContent = "Here's an overview of your account.";
-
-            await loadStudentDashboard();
-        });
-    </script>
+<script src="/js/api.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/student.js"></script>
+<script>
+    const user = utils.checkAuth(['student']);
+    if (user) {
+        utils.setupSidebar(user);
+        loadStudentDashboard();
+    }
+</script>
 </body>
 </html>

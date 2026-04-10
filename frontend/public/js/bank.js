@@ -31,14 +31,14 @@ async function loadBankProducts() {
             return products;
         }
         list.innerHTML = products.map(p => `
-            <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+            <div style="background:var(--surface-2); border:1px solid var(--border);
                         border-radius:0.5rem; padding:0.875rem; margin-bottom:0.625rem;
                         display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem;">
                 <div style="flex:1;">
                     <div style="font-weight:600; font-size:0.9375rem;">${p.name}</div>
-                    <div style="font-size:0.75rem; color:#818cf8; text-transform:uppercase; margin:0.15rem 0;">${p.loanType}</div>
+                    <div style="font-size:0.75rem; color:var(--primary); text-transform:uppercase; margin:0.15rem 0;">${p.loanType}</div>
                     <div style="font-size:0.8rem; color:#94a3b8; margin-top:0.25rem;">
-                        Rate: <strong style="color:white;">${p.interestRate}%</strong> &nbsp;|&nbsp;
+                        Rate: <strong style="color:var(--text);">${p.interestRate}%</strong> &nbsp;|&nbsp;
                         ₹${(p.minAmount||0).toLocaleString('en-IN')} – ₹${(p.maxAmount||0).toLocaleString('en-IN')} &nbsp;|&nbsp;
                         ${p.minTenureMonths}–${p.maxTenureMonths} months
                     </div>
@@ -198,11 +198,11 @@ async function loadBankDashboard() {
                         plugins: {
                             legend: {
                                 position: 'bottom',
-                                labels: { color: '#94a3b8', padding: 16, font: { family: "'Inter', sans-serif", size: 11, weight: '600' }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 }
+                                labels: { color: '#475569', padding: 16, font: { family: "'Inter', sans-serif", size: 11, weight: '600' }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 }
                             },
                             tooltip: {
-                                backgroundColor: '#1e1e2e', titleColor: '#e2e8f0', bodyColor: '#94a3b8',
-                                borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, cornerRadius: 8, padding: 10
+                                backgroundColor: '#1B1464', titleColor: '#fff', bodyColor: '#e2e8f0',
+                                borderColor: 'rgba(0,0,0,0.1)', borderWidth: 1, cornerRadius: 8, padding: 10
                             }
                         },
                         animation: { animateRotate: true, animateScale: true, duration: 1000, easing: 'easeOutQuart' }
@@ -256,7 +256,7 @@ function renderBankLoansTable() {
                         </td>
                         <td>
                             <button onclick="openBankReview('${loan._id}')"
-                                style="background:none; border:1px solid rgba(255,255,255,0.2); color:white; padding:0.3rem 0.75rem; border-radius:0.375rem; cursor:pointer; font-size:0.875rem;">
+                                style="background:var(--primary-dim); border:1px solid rgba(79,70,229,0.15); color:var(--primary); padding:0.3rem 0.75rem; border-radius:0.375rem; cursor:pointer; font-size:0.875rem; font-weight:600;">
                                 Review
                             </button>
                         </td>
@@ -299,7 +299,7 @@ function renderBankLoansTable() {
     const STATUS_DOT = { verified: '#10b981', rejected: '#ef4444', pending: '#f59e0b' };
 
     const block = (title, inner) => `
-        <div style="background:rgba(255,255,255,0.03); border-radius:0.5rem; padding:0.875rem; margin-bottom:0.75rem;">
+        <div style="background:var(--surface-2); border-radius:0.5rem; padding:0.875rem; margin-bottom:0.75rem;">
             <h4 class="text-muted text-sm" style="text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">${title}</h4>
             ${inner}
         </div>`;
@@ -379,8 +379,8 @@ function renderBankLoansTable() {
             ? '<p class="text-muted" style="font-size:0.8125rem;">No documents uploaded yet.</p>'
             : `<div style="display:flex; flex-direction:column; gap:0.5rem;">
                ${docs.map(doc => `
-                 <div style="background:rgba(255,255,255,0.04); border-radius:0.375rem; padding:0.625rem 0.75rem;
-                             border:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center;">
+                 <div style="background:var(--surface-2); border-radius:0.375rem; padding:0.625rem 0.75rem;
+                             border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
                    <div>
                      <span style="font-size:0.8125rem; font-weight:500;">${DOC_LABELS[doc.docType]||doc.docType}</span>
                      <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.25rem;">
@@ -390,7 +390,7 @@ function renderBankLoansTable() {
                      </div>
                    </div>
                    <a href="http://localhost:5001/uploads/${doc.filename}" target="_blank"
-                      style="font-size:0.75rem; color:#818cf8; white-space:nowrap; border:1px solid rgba(129,140,248,0.3); padding:0.2rem 0.6rem; border-radius:0.25rem;">
+                      style="font-size:0.75rem; color:var(--primary); white-space:nowrap; border:1px solid rgba(79,70,229,0.2); padding:0.2rem 0.6rem; border-radius:var(--radius-sm);">
                       View ↗
                    </a>
                  </div>`).join('')}
@@ -401,7 +401,7 @@ function renderBankLoansTable() {
         <div style="margin-top:0.5rem;">
         ${ loan.disbursementStatus === 'disbursed'
             /* ── State 3: Fully Disbursed ── */
-            ? `<div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3);
+            ? `<div style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.15);
                           border-radius:0.5rem; padding:1rem; text-align:center;">
                    <div style="font-size:1.5rem; margin-bottom:0.25rem;">✅</div>
                    <strong style="color:var(--success);">Loan Disbursed</strong>
@@ -411,7 +411,7 @@ function renderBankLoansTable() {
 
             : loan.bankVerified
             /* ── State 2: Button 1 done → show Button 2 ── */
-            ? `<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:0.5rem; padding:0.875rem;">
+            ? `<div style="background:var(--surface-2); border:1px solid var(--border); border-radius:0.5rem; padding:0.875rem;">
                    <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.875rem;">
                        <span style="color:var(--success);">✓</span>
                        <span style="color:var(--success); font-size:0.875rem; font-weight:600;">Eligibility sent to student (${utils.formatCurrency(loan.approvedAmount || loan.principalAmount)})</span>
@@ -421,12 +421,12 @@ function renderBankLoansTable() {
                        <div>
                            <label style="font-size:0.7rem; color:#94a3b8; display:block; margin-bottom:0.2rem;">Disbursed Amount (₹)</label>
                            <input type="number" id="disburse-amount-${loanId}" value="${loan.approvedAmount || loan.principalAmount}"
-                               style="width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:0.375rem; padding:0.4rem 0.6rem; color:white; font-size:0.875rem;">
+                               style="width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:0.375rem; padding:0.4rem 0.6rem; color:var(--text); font-size:0.875rem;">
                        </div>
                        <div>
                            <label style="font-size:0.7rem; color:#94a3b8; display:block; margin-bottom:0.2rem;">Note (optional — included in email)</label>
                            <textarea id="disburse-note-${loanId}" rows="2" placeholder="e.g. Amount credited within 3 working days..."
-                               style="width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:0.375rem; padding:0.4rem 0.6rem; color:white; font-size:0.8125rem; resize:vertical;">${loan.bankNote || ''}</textarea>
+                               style="width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:0.375rem; padding:0.4rem 0.6rem; color:var(--text); font-size:0.8125rem; resize:vertical;">${loan.bankNote || ''}</textarea>
                        </div>
                        <button onclick="disburseLoan('${loanId}')"
                            style="width:100%; background:linear-gradient(135deg,#7c3aed,#4f46e5); border:none; color:white;
@@ -438,19 +438,19 @@ function renderBankLoansTable() {
                </div>`
 
             /* ── State 1: Not yet verified → show Button 1 ── */
-            : `<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:0.5rem; padding:0.875rem;">
+            : `<div style="background:var(--surface-2); border:1px solid var(--border); border-radius:0.5rem; padding:0.875rem;">
                    <h4 class="text-muted text-sm" style="text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">📋 Button 1 — Set Eligible Amount &amp; Notify Student</h4>
                    <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:0.625rem;">After reviewing documents, set the eligible loan amount. Student will receive an email with amount, appointment date/time, and required documents.</p>
                    <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:0.75rem;">
                        <div>
                            <label style="font-size:0.7rem; color:#94a3b8; display:block; margin-bottom:0.2rem;">Eligible Amount (₹)</label>
                            <input type="number" id="approved-amount-${loanId}" value="${loan.principalAmount}"
-                               style="width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:0.375rem; padding:0.4rem 0.6rem; color:white; font-size:0.875rem;">
+                               style="width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:0.375rem; padding:0.4rem 0.6rem; color:var(--text); font-size:0.875rem;">
                        </div>
                        <div>
                            <label style="font-size:0.7rem; color:#94a3b8; display:block; margin-bottom:0.2rem;">Instructions for student (included in email)</label>
                            <textarea id="bank-note-${loanId}" rows="2" placeholder="e.g. Bring original documents, appear at 11 AM sharp..."
-                               style="width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:0.375rem; padding:0.4rem 0.6rem; color:white; font-size:0.8125rem; resize:vertical;"></textarea>
+                               style="width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:0.375rem; padding:0.4rem 0.6rem; color:var(--text); font-size:0.8125rem; resize:vertical;"></textarea>
                        </div>
                    </div>
                    <div style="display:flex; gap:0.625rem;">
